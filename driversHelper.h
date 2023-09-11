@@ -5,6 +5,10 @@
 
 namespace motor{
 
+void Motor_Driver_Control(int in_L, int in_R, int INH, int *L_Sense, int *R_Sense);
+void update();
+void pin_setup();
+
 // Motor Driver Pins (IFX007T)
 const uint8_t M_D_R = 26; // input for right motor
 const uint8_t M_D_L = 27; // input for left motor
@@ -39,7 +43,7 @@ void Motor_Driver_Control(int in_L, int in_R, int INH, int *L_Sense, int *R_Sens
 
 }
 
-void update_motor(){
+void update(){
 
     // update motor if enough time has passed
 
@@ -67,7 +71,7 @@ void pin_setup(){
 namespace led{
 
 void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val, int *IS); // sends controls to LED
-void update_led();
+void update();
 void pin_setup();
 
 // LED Driver Pins (IS pin is set to high impedance).
@@ -78,8 +82,6 @@ const uint8_t SCK_pin = 15; // DESL Diagnosis Selection (DSEL) digital toggle be
 const uint8_t SenseLED = 24; // IS Sense Output A/D analog digital converter pin
 
 unsigned long delay = 20; // how long to wait between LED behavior
-unsigned long prev_time = 0;
-unsigned long cur_time;
 
 void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val, int *IS){ // sends controls to LED
   /*
@@ -107,7 +109,10 @@ void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val, i
 
 }
 
-void update_led(){
+void update(){
+
+  static unsigned long prev_time = millis();
+  unsigned long cur_time = millis();
 
   // if enough time has passed, update LED
   if(cur_time - prev_time > delay){

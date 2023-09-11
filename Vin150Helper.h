@@ -18,14 +18,13 @@ int scaleB; // y-intercept of 150V scaling
 
 double reading_scaled = 0; // reading from 150V input
 
-// timing variables 
+// ms to wait for delay between readings
 unsigned long reading_delay = 20; 
-unsigned long prev_time = 0;
-unsigned long cur_time; 
 
 void update_reading(){
     
-    cur_time = millis();
+    static unsigned long prev_time = millis();
+    unsigned long cur_time = millis();
 
     // possibly update reading from 150V input
     if(cur_time - prev_time > reading_delay){
