@@ -8,77 +8,54 @@ class Vin_Convert{
 
     const uint8_t in_pin;
 
-    int scaleM;
-    int scaleB;
+    // scaling factors
+    int scaleM = 0;
+    int scaleB = 0;
 
-    // pointer to reading
-    double *reading_ptr;
-    
-    // actual readings
-    double reading; 
-    double reading_scaled
+    // actual reading and scaled reading
+
+    int analog_data; // 0-1023
+
+    double volt_data; // 0-5 volt read
+    double volt_scaled_data; // scaled reading according to scalM and scaleB
 
     unsigned long prev_time; 
     unsigned long cur_time;
-    unsigned long reading_delay;
+    unsigned long reading_delay = 20;
 
-    // take reading from Vin
-    double volt_read();
-    double volt_scaled_read();
+    int analog_read(); // digital read from i/o pin
 
 public:
 
     Vin_Convert();
 
+    // set scaling factor
+    void set_scaling(double m, double b);
+
     // update reading if ms has passed
     void update_reading();
 
-    void set_reading_ptr(double *reading);
+    // have vin take reading   
+    void volt_read(); // take and store reading in digital_reading, volt_reading, volt_reading_scaled 
 
-    // get already stored reading
-    double get_stored_reading();
-    double get_stored_scaled_reading();
+    // get already stored readings
+    int get_stored_digital_reading(); // 0- 1023
+    double get_stored_reading(); // 0-5
+    double get_stored_scaled_reading(); // between scalings
 
-    // set scaling factor
-    void set_scaling(double m, double b);
 };
 
 Vin_Convert::Vin_Convert(){
 
     // set timing
     this->prev_time = millis();
-    this->reading_delay = 20;
 
     // set input pins
     pinMode(IN150V, INPUT);
 
     // take 1 reading to initialize
-    volt_scaled_read();
+    volt_read();
 
-}
-
-
-void Vin_Convert::update_reading(){
-    // update reading if enough time has passed
-
-    this->cur_time = millis();
-
-    // possibly update reading from 150V input
-    if(this->cur_time - this->prev_time > this->reading_delay){
-        store_volt_scaled_read();
-        this->prev_time = this->cur_time;
-    }
-
-}
-
-double Vin_Convert::get_stored_reading(){
-    // return stored
-    return reading;
-}
-
-double Vin_Convert::get_stored_scaled_reading(){
-    // return stored
-    return reading_scaled;
 }
 
 void Vin_Convert::set_scaling(double m, double b){
@@ -87,19 +64,50 @@ void Vin_Convert::set_scaling(double m, double b){
     this->scaleB = b;
 }
 
-double Vin_Convert::volt_read(){
-  // reads analog input, returning 0-5
-  int val = analogRead(IN150V); // value between 0-1023
-  double voltage = (val/1023.0)*5.0; // convert to voltage
+void Vin_Convert::update_reading(){
+    // update reading if enough time has passed
 
-  return voltage;
+    this->cur_time = millis();
+
+    // if enough time has passed, update reading
+    if(this->cur_time - this->prev_time > this->reading_delay){
+        volt_read();
+        this->prev_time = this->cur_time;
+    }
+
 }
 
-double Vin_Convert::store_volt_scaled_read(){
+int Vin_Convert::get_stored_digital_reading(){
+    // return stored digital reading
+    return this->analog_data;
+}
+
+double Vin_Convert::get_stored_reading(){
+    // return stored volt reading
+    return this->volt_data;
+}
+
+double Vin_Convert::get_stored_scaled_reading(){
+    // return stored scaled reading
+    return this->volt_scaled_data;
+}
+
+int Vin_Convert::analog_read(){
+  // reads analog pin, returning val between 0-1023
+  int val = analogRead(IN150V); // 
+
+  return val;
+}
+
+void Vin_Convert::volt_read(){
     // reads 150V analog input, returning scaled value through global variables
-    double voltage_5v = store_volt_read(); // read 0-5V
+    int temp_analog_read = analog_read(); // read int 0-1023
+    double voltage_5v = temp_analog_read * 5.0/1023.0; // scale to 0-5V
     double voltage_150v = voltage_5v * this->scaleM + this->scaleB; // scale to 0-150V
-    this->reading_scaled = voltage_150v; // set global variable
     
-    return voltage_150v;
+    // set each class variable
+    this->analog_data = voltage_5v; // store digital reading
+    this->volt_data = voltage_5v; // store 5v reading in class variable
+    this->volt_scaled_data = voltage_150v; // store scaled reading in calss variable
+    
 }

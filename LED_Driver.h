@@ -8,13 +8,14 @@ class LED_Driver{
     unsigned long prev_time = 0;
     unsigned long cur_time;
 
+    void pin_setup();
+
 public:
 
     LED_Driver();
     
     void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val, int *IS); // sends controls to LED
     void update();
-    void pin_setup();
 
 };
 

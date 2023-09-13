@@ -11,17 +11,23 @@ class Motor_Driver{
     int L_Sense;
     int R_Sense;
 
+    void pin_setup();
+
 public:
 
     Motor_Driver(); // constructor for motor driver
 
-    void Motor_Driver_Control(int in_L, int in_R, int INH, int *L_Sense, int *R_Sense); // motor control
+    void Motor_Driver_Control(int in_L, int in_R, int INH); // motor control
     void update(); // update based on delay
 
 };
 
 Motor_Driver::Motor_Driver(){
     
+    pin_setup();
+}
+
+void Motor_Driver::pin_setup(){
     // set pins i/o
     pinMode(M_D_R, OUTPUT);
     pinMode(M_D_L, OUTPUT);
@@ -54,13 +60,13 @@ void Motor_Driver::Motor_Driver_Control(int in_L, int in_R, int INH){
     */
 
     // set left motor
-    gen::quick_digital_write(M_D_L, in_L);
+    quick_digital_write(M_D_L, in_L);
 
     // set right motor
-    gen::quick_digital_write(M_D_R, in_R);
+    quick_digital_write(M_D_R, in_R);
 
     // set inhibit
-    gen::quick_digital_write(M_EN, INH);
+    quick_digital_write(M_EN, INH);
 
     // write sense variables
     this->L_Sense = analogRead(SenseML);
