@@ -1,7 +1,18 @@
-#include "generalHelpers.h"
-#include "driversHelper.h"
-#include "Vin150Helper.h"
-#include "segDisplayHelper.h"
+#include "pins.h"
+
+#include "Segment_Display.h"
+#include "Vin_Convert.h"
+
+#include "Motor_Driver.h"
+#include "LED_Driver.h"
+
+Motor_Driver motor_driver;
+LED_Driver led_driver;
+
+Segment_Display seg_disp;
+Vin_Convert vin_convert;
+
+double * reading;
 
 void setup() {
 
@@ -11,33 +22,23 @@ void setup() {
   // begin serial communication 
   Serial.begin(9600);
 
-  // setup pins
-  VinConvert::pin_setup();
-
-  led::pin_setup();
-  motor::pin_setup();
-
-  segDisp::pin_setup();
-
-  // set scaling and get introductory reading from 150V input
-  VinConvert::set_scale(scaleM, scaleB); // set scale for 150V input
-  VinConvert::get_reading(); // get reading from 150V input
+  // set scaling
+  vin_convert.set_scaling(scaleM, scaleB);
+  vin_convert.set_reading_ptr(reading);
 
 }
 
 void loop() {
 
-  // possibly update following parts of device if enough time has passed!
+  // update all components
+  motor_driver.update();
+  led_driver.update();
+  vin_convert.update_reading();
 
-  // update display
-  segDisp::Display();
-  
-  // update reading from 150V input
-  VinConvert::update_reading();
-  
-  // update drivers
-  motor::update();
-  led::update();
+  // get reading
+  double vin_reading_scaled = vin_convert.get_stored_scaled_reading();
+
+  // display reading if possible!
+  seg_disp.update_disp(vin_reading_scaled);
 
 }
-

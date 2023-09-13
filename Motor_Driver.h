@@ -1,8 +1,26 @@
-#include "MotorDriver.h"
-#include "generalHelpers.h"
+#pragma once
+#include <Arduino.h>
 #include "pins.h"
 
-MotorDriver::MotorDriver(){
+class Motor_Driver{
+
+    unsigned long reading_delay = 20; // how long to wait between readings
+    unsigned long prev_time = 0;
+    unsigned long cur_time;
+
+    int L_Sense;
+    int R_Sense;
+
+public:
+
+    Motor_Driver(); // constructor for motor driver
+
+    void Motor_Driver_Control(int in_L, int in_R, int INH, int *L_Sense, int *R_Sense); // motor control
+    void update(); // update based on delay
+
+};
+
+Motor_Driver::Motor_Driver(){
     
     // set pins i/o
     pinMode(M_D_R, OUTPUT);
@@ -13,7 +31,7 @@ MotorDriver::MotorDriver(){
 
 }
 
-void MotorDriver::update(){
+void Motor_Driver::update(){
     // update motor if enough time has passed
 
     this->cur_time = millis();
@@ -25,7 +43,7 @@ void MotorDriver::update(){
 
 }
 
-void MotorDriver::Motor_Driver_Control(int in_L, int in_R, int INH){
+void Motor_Driver::Motor_Driver_Control(int in_L, int in_R, int INH){
 
     /*
     * in_L: input for left motor (High or Low)

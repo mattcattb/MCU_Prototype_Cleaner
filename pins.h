@@ -20,3 +20,27 @@ const uint8_t MISO_pin = 16; // IN1 LED activate output channel 1
 const uint8_t EN_LED_pin = 25; // DEN, “high”: diagnosis enabled. “low”: diagnosis disabled
 const uint8_t SCK_pin = 15; // DESL Diagnosis Selection (DSEL) digital toggle between channels
 const uint8_t SenseLED = 24; // IS Sense Output A/D analog digital converter pin
+
+// Segment Displays
+const uint8_t SEG1 = 12; 
+const uint8_t SEG2 = 13;
+const uint8_t SEG3 = 14;
+
+// to segment display 
+const uint8_t D_A = 30;
+const uint8_t D_B = 31;
+const uint8_t D_C = 32;
+const uint8_t D_D = 1;
+const uint8_t D_E = 2;
+const uint8_t D_F = 9;
+const uint8_t D_G = 10;
+const uint8_t D_dp = 11;
+
+void quick_digital_write(int pin, int value){
+// quickly does digital write on pin according to boolean value
+    if(value == 1){
+        digitalWrite(pin, HIGH); 
+    }else if(value == 0){
+        digitalWrite(pin, LOW);
+    }
+}
