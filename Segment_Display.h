@@ -8,14 +8,16 @@ class Segment_Display{
   uint8_t segment_encodings[10] ={0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011, 0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1110011}; // encodings for each number
 
   unsigned long seg_delay = 2; // ms delay between segment displays
-  unsigned long prev_time = 0; 
+  unsigned long prev_time; 
   unsigned long cur_time;
 
   int state = 0; // current state of 3 for each segment
   int num_states = 3; // number of states for each segment
 
-  void set_display(int value, int idx, int enable_dot = 0);
+  void set_display(int value, int idx);
   void pin_setup();
+
+  int get_digit(double display_val, int digit_idx); // get specific digit of float
 
 public:
 
@@ -28,14 +30,11 @@ Segment_Display::Segment_Display(){
   // set pins
   pin_setup();
 
-  // set display to 000 
-  set_display(0, 0);
-  set_display(0, 1);
-  set_display(0, 2);
+  this->prev_time = millis();
 
 }
 
-void Segment_Display::set_display(int value, int idx, int enable_dot = 0){
+void Segment_Display::set_display(int value, int idx){
   /*
 
    set display idx to value 
@@ -52,22 +51,19 @@ void Segment_Display::set_display(int value, int idx, int enable_dot = 0){
 
   uint8_t val_encoding = segment_encodings[value];
   
-  for (int i = 0; i < 10; i += 1){
+  for (int i = 0; i < 7; i += 1){
 
     // get the bit at the end of the encoding
     int on = 0b1 & val_encoding;
 
     // find analog pin of current segment
-    int cur_segment = segment_pins[7-i - 1];
+    int cur_segment = segment_pins[7- i - 1];
     
     // set that segment pin to on or off
     quick_digital_write(cur_segment, on);
 
     val_encoding = val_encoding/2; // shift right
   }
-
-  // turn dot on or off
-  quick_digital_write(D_dp, enable_dot);
 
   // now send the signals to the proper segment
   switch(idx){
@@ -84,6 +80,19 @@ void Segment_Display::set_display(int value, int idx, int enable_dot = 0){
   
 }
 
+int Segment_Display::get_digit(double value, int digit_idx){
+  // get the digit at the digit_idx of the display_val
+  for(int i = 0; i < digit_idx; i += 1){
+    value = value/10.0;  
+  }
+
+  // set that display to the number 
+  int digit = ((int)value)%10;
+
+  return digit;
+}
+
+
 void Segment_Display::update_disp(double display_val){
   // see if enough time has passed, if so, turn on segment to the reading and go to next state
   this->cur_time = millis();
@@ -95,12 +104,10 @@ void Segment_Display::update_disp(double display_val){
     this->prev_time = this->cur_time;
 
     // get the digit to display 
-    for(int i = 0; i < (this->num_states - this->state); i += 1){
-      display_val = display_val/10.0;  
-    }
+    int digit_idx = this->num_states - this->state;
+    int digit = get_digit(display_val, digit_idx);
 
     // set that display to the number 
-    int digit = (int)display_val%10;
     set_display(state, digit);
 
     // increase state

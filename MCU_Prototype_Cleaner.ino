@@ -15,9 +15,9 @@ Vin_Convert vin_convert;
 
 void setup() {
 
-  // scaling variables
-  int scaleM = 30; // slope of 150V scaling
-  int scaleB = 0; // y-intercept of 150V scaling
+  // scaling variables: 0v = 170Vin, 130V = 0Vin
+  int scaleM = -8; // slope of 150V scaling
+  int scaleB = 170; // y-intercept of 150V scaling
 
   // begin serial communication 
   Serial.begin(9600);
@@ -35,7 +35,7 @@ void loop() {
   vin_convert.update_reading();
 
   // get already stored scaled reading
-  double vin_reading_scaled = vin_convert.get_stored_scaled_reading();
+  double vin_reading_scaled = vin_convert.latest_reading();
 
   // display this scaled reading if possible
   seg_disp.update_disp(vin_reading_scaled);

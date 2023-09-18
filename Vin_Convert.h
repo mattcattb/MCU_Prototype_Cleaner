@@ -1,60 +1,89 @@
 #pragma once
 #include <Arduino.h>
+#include <cppQueue.h>
 #include "pins.h"
 
-//! NEED TO FIX FUCKED UP THINGS READING!!
-
 class Vin_Convert{
-
-    const uint8_t in_pin;
 
     // scaling factors
     int scaleM = 0;
     int scaleB = 0;
 
-    // actual reading and scaled reading
+    // latest reading
+    double latest_reading; // scaled reading according to scalM and scaleB
 
-    int analog_data; // 0-1023
-
-    double volt_data; // 0-5 volt read
-    double volt_scaled_data; // scaled reading according to scalM and scaleB
-
+    unsigned long reading_delay = 20; // take reading every 20 ms
     unsigned long prev_time; 
     unsigned long cur_time;
-    unsigned long reading_delay = 20;
+
+    int window_size = 10; // number of averages to take for reading
+    double rolling_average = 0; // average of volt_scaled_data
+
+    // (size_t size_rec, uint16_t nb_recs=20, QueueType type=FIFO, bool overwrite=false, void * pQDat=NULL, size_t lenQDat=0
+
+    cppQueue *volt_scaled_queue; // pointer to queue of readings
 
     int analog_read(); // digital read from i/o pin
 
+    // have vin take reading and store to class variables   
+    void volt_read();  
+    void calc_rolling_avg(); // calculate rolling avg based on volt_scaled_data
+
 public:
 
+
     Vin_Convert();
+    Vin_Convert(int window_size, int delay_time);
 
     // set scaling factor
     void set_scaling(double m, double b);
 
-    // update reading if ms has passed
+    // check if enough time has passed to update reading
     void update_reading();
 
-    // have vin take reading   
-    void volt_read(); // take and store reading in digital_reading, volt_reading, volt_reading_scaled 
-
-    // get already stored readings
-    int get_stored_digital_reading(); // 0- 1023
-    double get_stored_reading(); // 0-5
-    double get_stored_scaled_reading(); // between scalings
+    // average of last 10 readings
+    double get_reading(); // rolling average of last 10 readings
 
 };
 
-Vin_Convert::Vin_Convert(){
+Vin_Convert::latest_reading(){
+    // return rolling average reading
+    return this->rolling_average;
+}
 
-    // set timing
-    this->prev_time = millis();
+Vin_Convert::Vin_Convert(){
 
     // set input pins
     pinMode(IN150V, INPUT);
 
+    // create queue
+    this->volt_scaled_queue = new cppQueue(sizeof(double), this->window_size, FIFO, true);
+
     // take 1 reading to initialize
     volt_read();
+
+    // set timing
+    this->prev_time = millis();
+
+}
+
+
+Vin_Convert::Vin_Convert(int window_size, int delay_time){
+
+    // set input pins
+    pinMode(IN150V, INPUT);
+
+    this->window_size = window_size;
+    this->reading_delay = delay_time;
+
+    // create queue
+    this->volt_scaled_queue = new cppQueue(sizeof(double), window_size, FIFO, true);
+
+    // take 1 reading to initialize
+    volt_read();
+
+    // set timing
+    this->prev_time = millis();
 
 }
 
@@ -77,25 +106,27 @@ void Vin_Convert::update_reading(){
 
 }
 
-int Vin_Convert::get_stored_digital_reading(){
-    // return stored digital reading
-    return this->analog_data;
-}
+void Vin_Convert::calc_rolling_avg(){
+    // use latest reading to update rolling average and queue
 
-double Vin_Convert::get_stored_reading(){
-    // return stored volt reading
-    return this->volt_data;
-}
+    int queue_size = this->volt_scaled_queue->size();
 
-double Vin_Convert::get_stored_scaled_reading(){
-    // return stored scaled reading
-    return this->volt_scaled_data;
+    if(queue_size > this->window_size){
+        // if queue is too big, remove oldest reading and adjust average accordingly
+        double oldest_reading = volt_scaled_queue->front();
+        this->volt_scaled_queue->pop();
+        this->rolling_average -= ((oldest_reading) * (1/queue_size)); // remove from rolling average
+    }
+
+    this->volt_scaled_queue->push(this->latest_reading); // add latest reading to queue
+    this->rolling_average += (this->latest_reading) * (1/this->window_size); // add to rolling average
+
+
 }
 
 int Vin_Convert::analog_read(){
   // reads analog pin, returning val between 0-1023
-  int val = analogRead(IN150V); // 
-
+  int val = analogRead(IN150V); 
   return val;
 }
 
@@ -106,8 +137,8 @@ void Vin_Convert::volt_read(){
     double voltage_150v = voltage_5v * this->scaleM + this->scaleB; // scale to 0-150V
     
     // set each class variable
-    this->analog_data = voltage_5v; // store digital reading
-    this->volt_data = voltage_5v; // store 5v reading in class variable
-    this->volt_scaled_data = voltage_150v; // store scaled reading in calss variable
+    this->latest_reading = voltage_150v; // store scaled reading 
     
+    // calculate rolling average with this reading
+    calc_rolling_avg();
 }
