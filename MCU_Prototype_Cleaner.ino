@@ -35,9 +35,9 @@ void loop() {
   vin_convert.update_reading();
 
   // get already stored scaled reading
-  double vin_reading_scaled = vin_convert.latest_reading();
+  double vin_avg_scaled = vin_convert.get_latest_reading();
 
   // display this scaled reading if possible
-  seg_disp.update_disp(vin_reading_scaled);
+  seg_disp.update_disp(vin_avg_scaled);
 
 }

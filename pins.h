@@ -36,6 +36,9 @@ const uint8_t D_F = 9;
 const uint8_t D_G = 10;
 const uint8_t D_dp = 11;
 
+// number of digits for precision
+uint8_t precision = 4; // 8 units of precision 
+
 void quick_digital_write(int pin, int value){
 // quickly does digital write on pin according to boolean value
     if(value == 1){
@@ -43,4 +46,10 @@ void quick_digital_write(int pin, int value){
     }else if(value == 0){
         digitalWrite(pin, LOW);
     }
+}
+
+int pack_double(double val){
+  // packs double into an integer according to set precision
+  
+  
 }
