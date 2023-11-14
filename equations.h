@@ -1,10 +1,6 @@
 // Electical Equation Functions
 
 
-double R_LINE_EQ(double vt_0, double vt_1, double Pd_LEDL, double Pd_bias){
-    return (vt_0 * vt_1)/(Pd_LEDL * vt_0/(vt_0-vt_1) + Pd_bias);
-}
-
 // ====== Voltage Truck Equations ========
 
 double no_load_V_truck(double Vt_0, double Pd_bias, double R_line){
@@ -46,3 +42,18 @@ double Pd_bias_two_three(double Vt1, double Vt2, double Pd_LEDL, double Pd_LEDR,
 }
 
 // ====== Resistance Line Equations
+
+double R_LINE_EQ(double vt_0, double vt_1, double Pd_LEDL, double Pd_bias){
+    return (vt_0 * vt_1)/(Pd_LEDL * vt_0/(vt_0-vt_1) + Pd_bias);
+}
+
+
+// ====== Power LED Left and Right
+
+double Pd_LEDL_equ(double I_LEDL, double V_out, double n_eff){
+
+}
+
+double Pd_LEDR_equ(){
+
+}

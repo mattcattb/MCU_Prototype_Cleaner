@@ -35,6 +35,7 @@ class Vin_Convert{
 public:
 
     double analog_read_scaled(); // take a scaled voltage reading and return it
+    double analog_read_scaled(int avg_times); // take an average over that many readings
 
     Vin_Convert();
     Vin_Convert(int window_size, int delay_time);
@@ -141,6 +142,18 @@ double Vin_Convert::analog_read_scaled(){
     double voltage_150v = voltage_5v * this->scaleM + this->scaleB; // scale to 0-150V
 
     return voltage_150v;
+}
+
+double Vin_Convert::analog_read_scaled(int avg_times){ 
+    // take an average over that many readings
+    double sum = 0;
+
+    for(int i = 0; i < avg_times; i += 1){
+        sum += analog_read_scaled();
+    }
+
+    double average = sum\avg_times;
+    return average;
 }
 
 void Vin_Convert::volt_read(){

@@ -89,7 +89,7 @@ void Motor_Driver::write_state(){
 }
 
 void Motor_Driver::set_state(int state){
-    // set state of motor driver
+    // set state of motor driver (0: sleep, 1: brake, 2: left, 3: right)
     this->state = state;
 }
 

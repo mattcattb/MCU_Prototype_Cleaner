@@ -12,20 +12,28 @@
 void setup_timer1();
 void voltage_calc_phase();
 
+// voltage of truck
 double Vt_truck;
 
+// voltages for 0, 1, 2 LEDs on 
 double Vt_0;
 double Vt_1; 
 double Vt_2;
 
+// LED currents
 double I_LEDL;
 double I_LEDR;
 
 const double R_Line; // resistance of line 
 
+// power 
 double Pd_bias;
 double Pd_LEDL;
 double Pd_LEDR;
+
+// constant n_eff, Voltage out
+const double n_eff = 0.7;
+const double Vt_out = 24;
 
 Motor_Driver motor_driver;
 LED_Driver led_driver;
@@ -114,14 +122,7 @@ void voltage_calc_phase(){
   // calculate vt0, vt1, vt2, R_line, Vt_truck, Pd_LEDL, Pd_LEDR
 
   // measure vt0 through averaging 100 samples
-
-  double vt0_avg = 0;
-  for(int i = 0; i < 100; i += 1){
-    vt0_avg += vin_convert.analog_read_scaled();
-  }
-
-  vt0_avg =/ 100;
-  Vt_0 = vt0_avg;
+  Vt_0 = vin_convert.analog_read_scaled(100);
 
   // turn left LED light and wait 30 ms
   led_driver.set_channels(1, 0);
@@ -129,13 +130,7 @@ void voltage_calc_phase(){
 
   // measure Vt1 and I_LED.left over 100 samples avg
   //? equation sheet says ILED.l = 1 A... how do I recalulate it...
-  double vt1_avg = 0;
-  for(int i = 0; i < 100; i += 1){
-    vt1_avg += vin_convert.analog_read_scaled();
-  }
-
-  vt1_avg /= 100; // divide by 100 for average
-  Vt_1 = vt1_avg;
+  Vt_1 = vin_convert.analog_read_scaled(100);
 
   // turn right LED on (both on) and wait 50 ms
 
@@ -144,16 +139,14 @@ void voltage_calc_phase(){
 
   // measure Vt2 and I_LED.right over 200 samples avg
   //? what is Vt2? equation sheet says I_LED.right is 1.1 A 
+  Vt_2 = vin_convert.analog_read_scaled(200);
 
-  double vt2_avg = 0;
-  for(int i = 0; i < 200; i += 1){
-    vt2_avg += vin_convert.analog_read_scaled();
-  }
-  vt2_avg /= 200;
-  Vt_2 = vt2_avg;
+  // calculate PdLEDL, PdLEDR
 
+  
+  
   // using equation 8 calculate RLine and store as constant 
-  // RLine = (Vt0 * VT1)/(PdLED.I * Vt0/(Vt0-Vt1) + Pdbias)
+  // RLine = (Vt0 * VT1)/(PdLED.L * Vt0/(Vt0-Vt1) + Pdbias)
   R_Line = R_LINE_EQ(Vt_0, Vt_1, Pd_LEDL, Pd_bias);
 
   // using equation 7 calculate external bias power pdbias and store as semi-constant variable
