@@ -19,6 +19,8 @@ double two_load_V_truck(double Vt_2, double Pd_bias, double Pd_LEDL, double Pd_L
 
 double Pd_bias_one_two(double Vt0, double Vt1, double Pd_LEDL, double R_line){
     // setting no load voltage truck equation equal to 1 load voltage truck to get Pd
+    // pdbias = ((Vt0 - Vt1)/Rline - PdLED.l/Vt1)*(Vt0 * Vt1)/(Vt0 - Vt1) 
+
     double val_1 = (Vt0 - Vt1)/R_line;
     double val_2 = Pd_LEDL/Vt1;
     double val_3 = (Vt0*Vt1)/(Vt0 - Vt1);
@@ -43,17 +45,17 @@ double Pd_bias_two_three(double Vt1, double Vt2, double Pd_LEDL, double Pd_LEDR,
 
 // ====== Resistance Line Equations
 
-double R_LINE_EQ(double vt_0, double vt_1, double Pd_LEDL, double Pd_bias){
+double R_LINE_EQ_One(double vt_0, double vt_1, double Pd_LEDL, double Pd_bias){
+    // RLine = (Vt0 * VT1)/(PdLED.L * Vt0/(Vt0-Vt1) + Pdbias)
     return (vt_0 * vt_1)/(Pd_LEDL * vt_0/(vt_0-vt_1) + Pd_bias);
 }
 
+double R_LINE_EQ_Two(double vt_0, double vt_1, double vt_2, double Pd_LEDL, double Pd_LEDR){
+    // vt0, vt1, vt2, PdL, PdR
+    double val1 = vt_2 - vt_1;
+    double val2 = (Pd_LEDL + Pd_LEDR)/(vt_0-vt_2);
+    double val3 = (Pd_LEDL)/(vt_0-vt_1);
 
-// ====== Power LED Left and Right
-
-double Pd_LEDL_equ(double I_LEDL, double V_out, double n_eff){
-
-}
-
-double Pd_LEDR_equ(){
-
+    double rline = val1/(val2 - val3);
+    return rline;
 }

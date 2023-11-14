@@ -2,31 +2,25 @@
 #include <Arduino.h>
 #include "pins.h"
 
-class LED_Driver{
+struct LED_Driver
+{
+    double sense_scaling_m;
+    double sense_scaling_b;
 
-    unsigned long delay = 20; // how long to wait between LED behavior
-    unsigned long prev_time;
-    unsigned long cur_time;
+    int ch_0_state;
+    int ch_1_state;
 
-    // LED channel outputs
-    int ch_0;  
-    int ch_1; 
+    double current; // latest current value 
+    
+    LED_Driver_Controller(double m = 1, double b = 0);
 
-    int IS;
+    void set_scaling(double m, double b);
 
     void pin_setup();
-    void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val); // sends controls to LED
+    void LED_Driver_Control();
 
-    void write_channels();
-
-public:
-
-    LED_Driver();
-    void update(); // update based on time passed
-
-     // get current sense for LED
-    int get_IS();
-    void set_channels(int ch_0, int ch_1); // set channels to on or off
+    void write(int ch_0, int ch_1); // set LEDL, LEDR channels
+    double read(int n = 1); // get current reading amps
 
 };
 
@@ -36,9 +30,24 @@ LED_Driver::LED_Driver(){
   // start with all channels off
   this->ch_0 = 0;
   this->ch_1 = 0;
-
-  this->prev_time = millis();
 }
+
+void LED_Driver::set_scaling(double m, double b){
+    // set scaling values for current
+    sense_scaling_m = m;
+    sense_scaling_b = b;
+}
+
+void LED_Driver::pin_setup(){
+    // led driver pin setup
+    pinMode(MOSI_pin, OUTPUT);
+    pinMode(MISO_pin, OUTPUT);
+    pinMode(EN_LED_pin, OUTPUT);
+    pinMode(SCK_pin, OUTPUT);
+
+    pinMode(SenseLED_pin, INPUT);
+}
+
 
 void LED_Driver::LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val){ // sends controls to LED
   /*
@@ -62,45 +71,23 @@ void LED_Driver::LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int
   quick_digital_write(SCK_pin, DSEL_val);
 
   // read Current Sense for LED and save in IS pointer
-  this->IS = analogRead(SenseLED_pin);
+  this->IS_val = analogRead(SenseLED_pin);
 
 }
 
-void LED_Driver::set_channels(int ch_0, int ch_1){
-  // set channels to on or off
-  this->ch_0 = ch_0;
-  this->ch_1 = ch_1;
+void LED_Driver::write(int ch_0, int ch_1){ 
+    // set LEDL, LEDR channels
+    LED_Driver_Controller_Control(this->ch_0, this->ch_1, 1, 1)
 }
 
-void LED_Driver::write_channels(){
-  // write channels to LED
-  LED_Driver_Control(this->ch_0, this->ch_1, 1, 1);
-}
+double LED_Driver::read(int n){
+    // scale to get current reading in amps
+    double sum = 0;
+    int analog_val;
+    for(int i = 0; i < n; i += 1){
+        analog_val = analogRead(SenseLED_pin);
+        sum += analog_val*sense_scaling_m + sense_scaling_b;
+    }
 
-void LED_Driver::update(){
-
-  this->cur_time = millis();
-
-  // if enough time has passed, update LED
-  if(cur_time - prev_time > delay){
-    
-    write_channels();
-    prev_time = cur_time;
-  }
-
-}
-
-int LED_Driver::get_IS(){ 
-  // get current sense for LED
-  return this->IS;
-}
-
-void LED_Driver::pin_setup(){
-    // led driver pin setup
-    pinMode(MOSI_pin, OUTPUT);
-    pinMode(MISO_pin, OUTPUT);
-    pinMode(EN_LED_pin, OUTPUT);
-    pinMode(SCK_pin, OUTPUT);
-
-    pinMode(SenseLED_pin, INPUT);
+    return sum/n;
 }

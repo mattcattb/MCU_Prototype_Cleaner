@@ -15,21 +15,14 @@ void voltage_calc_phase();
 // voltage of truck
 double Vt_truck;
 
-// voltages for 0, 1, 2 LEDs on 
-double Vt_0;
-double Vt_1; 
-double Vt_2;
-
-// LED currents
-double I_LEDL;
-double I_LEDR;
-
 const double R_Line; // resistance of line 
 
 // power 
 double Pd_bias;
 double Pd_LEDL;
 double Pd_LEDR;
+
+int cycle = 0;
 
 // constant n_eff, Voltage out
 const double n_eff = 0.7;
@@ -44,16 +37,21 @@ Vin_Convert vin_convert;
 void setup() {
 
   // scaling variables: 0v = 170Vin, 130V = 0Vin
-  int scaleM = -8; // slope of 150V scaling
-  int scaleB = 170; // y-intercept of 150V scaling
+  int vin_scaleM = -8; // slope of 150V scaling
+  int vin_scaleB = 170; // y-intercept of 150V scaling
+
+  // scaling for LED current (0-1.5 amps) 
+  double led_scaleM = 1.5;
+  double led_scaleB = 0;
 
   // begin serial communication 
   Serial.begin(9600);
 
-  // set scaling
-  vin_convert.set_scaling(scaleM, scaleB);
+  // set scaling for Vin voltage and LED current
+  vin_convert.set_scaling(vin_scaleM, vin_scaleB);
+  led_driver.set_scaling(led_scaleM, led_scaleB);
 
-  // calculate voltage values
+  // calculate voltage and resistance values
   voltage_calc_phase();
 
   // setup the Timer Interrupts
@@ -75,6 +73,9 @@ ISR(TIMER1_COMPA_vect){
   // timer 1 at 240 hz
 
   // check Vt2 (every 150 ms) and recalc truck voltage vtruck
+  if (cycle/240.0 >= 150.0){
+    Vt_2 = vin_convert.read();
+  } 
 
   // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measruing VT1 
   // turning LED back on and using equation 7 to recalculate Pdbias
@@ -89,16 +90,10 @@ ISR(TIMER1_COMPA_vect){
   // if truck voltage incrased from below 150V to 155V stop lowering the lift (turn motor off)
   
 
-  // update all components
-  motor_driver.update();
-  led_driver.update(); 
-  vin_convert.update_reading();
 
-  // get already stored scaled reading
-  double vin_reading_scaled = vin_convert.latest_reading();
-
-  // display this scaled reading if possible
+  // display scaled reading
   seg_disp.update_disp(vin_reading_scaled);
+  cycle ++; 
 }
 
 void setup_timer1(){
@@ -122,38 +117,48 @@ void voltage_calc_phase(){
   // calculate vt0, vt1, vt2, R_line, Vt_truck, Pd_LEDL, Pd_LEDR
 
   // measure vt0 through averaging 100 samples
-  Vt_0 = vin_convert.analog_read_scaled(100);
+  double Vt_0 = vin_convert.read(100);
 
   // turn left LED light and wait 30 ms
-  led_driver.set_channels(1, 0);
+  led_driver.write(1, 0);
   delay(30);
 
   // measure Vt1 and I_LED.left over 100 samples avg
   //? equation sheet says ILED.l = 1 A... how do I recalulate it...
-  Vt_1 = vin_convert.analog_read_scaled(100);
+  double Vt_1 = vin_convert.read(100);
+  double I_LEDL = led_driver.read(100);
 
   // turn right LED on (both on) and wait 50 ms
-
-  led_driver.set_channels(1, 1);
+  led_driver.write(1, 1);
   delay(50);
 
   // measure Vt2 and I_LED.right over 200 samples avg
-  //? what is Vt2? equation sheet says I_LED.right is 1.1 A 
-  Vt_2 = vin_convert.analog_read_scaled(200);
+  double Vt_2 = vin_convert.read(200);
+  double I_LEDR = led_driver.read(200);
 
-  // calculate PdLEDL, PdLEDR
-
-  
+  // calculate PdLEDL, PdLEDR, PdBias
+  Pd_LEDL = (I_LEDL*Vt_out)/n_eff;
+  Pd_LEDR = (I_LEDR*Vt_out)/n_eff;
   
   // using equation 8 calculate RLine and store as constant 
-  // RLine = (Vt0 * VT1)/(PdLED.L * Vt0/(Vt0-Vt1) + Pdbias)
-  R_Line = R_LINE_EQ(Vt_0, Vt_1, Pd_LEDL, Pd_bias);
+  R_Line = R_LINE_EQ_Two(Vt_0, Vt_1, Vt_2, Pd_LEDL, Pd_LEDR);
 
   // using equation 7 calculate external bias power pdbias and store as semi-constant variable
-  // pdbias = ((Vt0 - Vt1)/Rline - PdLED.l/Vt1)*(Vt0 * Vt1)/(Vt0 - Vt1) 
-
+  Pd_bias = Pd_bias_one_two(Vt_0, Vt_1, Pd_LEDL, R_Line);
+  
   // using equation 3 measure truck voltage Vtruck
-  // Vt_truck = 
+  Vt_truck = two_load_V_truck(Vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_line)
 
-  // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
+  //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
+
+  unsigned long interval = 100;
+  unsigned long start_millis = millis();
+  unsigned long curMillis = millis();
+  
+  while(curMillis < start_millis + interval){
+    
+    Vt_2 = 
+    curMillis = millis();
+  } 
+
 }
