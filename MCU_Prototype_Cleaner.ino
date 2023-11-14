@@ -9,11 +9,8 @@
 #include <avr/sleep.h>
 #include <avr/power.h>
 
-Motor_Driver motor_driver;
-LED_Driver led_driver;
-
-Segment_Display seg_disp;
-Vin_Convert vin_convert;
+void setup_timer1();
+void voltage_calc_phase();
 
 double Vt_truck;
 
@@ -24,28 +21,17 @@ double Vt_2;
 double I_LEDL;
 double I_LEDR;
 
-double R_Line; // resistance of line 
+const double R_Line; // resistance of line 
 
 double Pd_bias;
 double Pd_LEDL;
 double Pd_LEDR;
 
-void setup_timer1(){
+Motor_Driver motor_driver;
+LED_Driver led_driver;
 
-  cli(); // stop interupts
-
-  TCCR1A = 0; // set TCCR1A reg to 0
-  TCCR1B = 0; // set TCCR1B reg to 0
-  TCNT1 = 0; // set counter to 0
-
-  OCR1A = 999; // Compare Match Register Value
-  TCCR1A |= (1 << WGM12); // turn on CTC mode
-  TCCR1B |= (1 << CS11) | (1 << CS10); // 64 bit prescaler
-  TIMSK1 |= (1 << OCIE1A); // enable timer compare interupt 
-
-  sei(); // enable interupts again 
-
-}
+Segment_Display seg_disp;
+Vin_Convert vin_convert;
 
 void setup() {
 
@@ -59,6 +45,9 @@ void setup() {
   // set scaling
   vin_convert.set_scaling(scaleM, scaleB);
 
+  // calculate voltage values
+  voltage_calc_phase();
+
   // setup the Timer Interrupts
   setup_timer1()
 
@@ -67,35 +56,6 @@ void setup() {
 
   // Enable sleep mode
   sleep_enable();
-
-  // measure vt0 through averaging 100 samples
-
-  // turn left LED light and wait 30 ms
-  led_driver.set_channels(1, 0);
-  delay(30);
-
-  // measure Vt1 and I_LED.left over 100 samples avg
-  //? equation sheet says ILED.l = 1 A... how do I recalulate it...
-  // Vt1 = ... idk
- 
-  // turn right LED on (both on) and wait 50 ms
-
-  led_driver.set_channels(1, 1);
-  delay(50);
-
-  // measure Vt2 and I_LED.right over 200 samples avg
-  //? what is Vt2? equation sheet says I_LED.right is 1.1 A 
-
-  // using equation 8 calculate RLine and store as constant 
-  // RLine = (Vt0 * VT1)/(PdLED.I * Vt0/(Vt0-Vt1) + Pdbias)
-
-  // using equation 7 calculate external bias power pdbias and store as semi-constant variable
-  // pdbias = ((Vt0 - Vt1)/Rline - PdLED.l/Vt1)*(Vt0 * Vt1)/(Vt0 - Vt1) 
-
-  // using equation 3 measure truck voltage Vtruck
-  // Vt_truck = 
-
-  // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 
 }
 
@@ -131,4 +91,76 @@ ISR(TIMER1_COMPA_vect){
 
   // display this scaled reading if possible
   seg_disp.update_disp(vin_reading_scaled);
+}
+
+void setup_timer1(){
+
+  cli(); // stop interupts
+
+  TCCR1A = 0; // set TCCR1A reg to 0
+  TCCR1B = 0; // set TCCR1B reg to 0
+  TCNT1 = 0; // set counter to 0
+
+  OCR1A = 999; // Compare Match Register Value
+  TCCR1A |= (1 << WGM12); // turn on CTC mode
+  TCCR1B |= (1 << CS11) | (1 << CS10); // 64 bit prescaler
+  TIMSK1 |= (1 << OCIE1A); // enable timer compare interupt 
+
+  sei(); // enable interupts again 
+
+}
+
+void voltage_calc_phase(){
+  // calculate vt0, vt1, vt2, R_line, Vt_truck, Pd_LEDL, Pd_LEDR
+
+  // measure vt0 through averaging 100 samples
+
+  double vt0_avg = 0;
+  for(int i = 0; i < 100; i += 1){
+    vt0_avg += vin_convert.analog_read_scaled();
+  }
+
+  vt0_avg =/ 100;
+  Vt_0 = vt0_avg;
+
+  // turn left LED light and wait 30 ms
+  led_driver.set_channels(1, 0);
+  delay(30);
+
+  // measure Vt1 and I_LED.left over 100 samples avg
+  //? equation sheet says ILED.l = 1 A... how do I recalulate it...
+  double vt1_avg = 0;
+  for(int i = 0; i < 100; i += 1){
+    vt1_avg += vin_convert.analog_read_scaled();
+  }
+
+  vt1_avg /= 100; // divide by 100 for average
+  Vt_1 = vt1_avg;
+
+  // turn right LED on (both on) and wait 50 ms
+
+  led_driver.set_channels(1, 1);
+  delay(50);
+
+  // measure Vt2 and I_LED.right over 200 samples avg
+  //? what is Vt2? equation sheet says I_LED.right is 1.1 A 
+
+  double vt2_avg = 0;
+  for(int i = 0; i < 200; i += 1){
+    vt2_avg += vin_convert.analog_read_scaled();
+  }
+  vt2_avg /= 200;
+  Vt_2 = vt2_avg;
+
+  // using equation 8 calculate RLine and store as constant 
+  // RLine = (Vt0 * VT1)/(PdLED.I * Vt0/(Vt0-Vt1) + Pdbias)
+  R_Line = R_LINE_EQ(Vt_0, Vt_1, Pd_LEDL, Pd_bias);
+
+  // using equation 7 calculate external bias power pdbias and store as semi-constant variable
+  // pdbias = ((Vt0 - Vt1)/Rline - PdLED.l/Vt1)*(Vt0 * Vt1)/(Vt0 - Vt1) 
+
+  // using equation 3 measure truck voltage Vtruck
+  // Vt_truck = 
+
+  // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 }

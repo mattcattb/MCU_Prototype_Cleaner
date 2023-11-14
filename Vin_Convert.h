@@ -34,6 +34,7 @@ class Vin_Convert{
 
 public:
 
+    double analog_read_scaled(); // take a scaled voltage reading and return it
 
     Vin_Convert();
     Vin_Convert(int window_size, int delay_time);
@@ -131,6 +132,15 @@ int Vin_Convert::analog_read(){
   // reads analog pin, returning val between 0-1023
   int val = analogRead(IN150V); 
   return val;
+}
+
+double Vin_Convert::analog_read_scaled(){
+    // reads 150V analog input, returning scaled value through global variables
+    int temp_analog_read = analog_read(); // read int 0-1023
+    double voltage_5v = temp_analog_read * 5.0/1023.0; // scale to 0-5V
+    double voltage_150v = voltage_5v * this->scaleM + this->scaleB; // scale to 0-150V
+
+    return voltage_150v;
 }
 
 void Vin_Convert::volt_read(){

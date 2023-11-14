@@ -2,7 +2,7 @@
 
 
 double R_LINE_EQ(double vt_0, double vt_1, double Pd_LEDL, double Pd_bias){
-    
+    return (vt_0 * vt_1)/(Pd_LEDL * vt_0/(vt_0-vt_1) + Pd_bias);
 }
 
 // ====== Voltage Truck Equations ========
