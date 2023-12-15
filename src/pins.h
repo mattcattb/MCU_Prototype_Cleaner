@@ -36,7 +36,7 @@ const uint8_t D_F = 9;
 const uint8_t D_G = 10;
 const uint8_t D_dp = 11;
 
-void quick_digital_write(int pin, int value){
+externvoid quick_digital_write(int pin, int value){
 // quickly does digital write on pin according to boolean value
     if(value == 1){
         digitalWrite(pin, HIGH); 

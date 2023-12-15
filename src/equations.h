@@ -1,5 +1,7 @@
+#pragma once
 // Electical Equation Functions
 
+//todo add zero checking 
 
 // ====== Voltage Truck Equations ========
 

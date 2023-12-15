@@ -1,10 +1,11 @@
-#include "pins.h"
+#include "src/pins.h"
+#include "src/equations.h"
 
-#include "Segment_Display.h"
-#include "Vin_Convert.h"
+#include "src/Segment/Segment_Display.h"
+#include "src/Vin/Vin_Convert.h" 
 
-#include "Motor_Driver.h"
-#include "LED_Driver.h"
+#include "src/Motor/Motor_Driver.h"
+#include "src/LED/LED_Driver.h"
 
 #include <avr/sleep.h>
 #include <avr/power.h>
@@ -15,7 +16,7 @@ void voltage_calc_phase();
 // voltage of truck
 double Vt_truck;
 
-const double R_Line; // resistance of line 
+double R_Line; // resistance of line 
 
 // power 
 double Pd_bias;
@@ -93,7 +94,7 @@ ISR(TIMER1_COMPA_vect){
 
 
   // display scaled reading
-  seg_disp.update_disp(vin_reading_scaled);
+  seg_disp.update_disp(100);
   cycle ++; 
 }
 
@@ -148,7 +149,7 @@ void voltage_calc_phase(){
   Pd_bias = Pd_bias_one_two(Vt_0, Vt_1, Pd_LEDL, R_Line);
   
   // using equation 3 measure truck voltage Vtruck
-  Vt_truck = two_load_V_truck(Vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_line)
+  Vt_truck = two_load_V_truck(Vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
 
   //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 

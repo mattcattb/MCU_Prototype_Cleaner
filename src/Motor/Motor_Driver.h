@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include "pins.h"
+#include "../pins.h"
 
 class Motor_Driver{
 
