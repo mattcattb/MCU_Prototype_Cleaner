@@ -22,6 +22,7 @@ double Pd_bias;
 double Pd_LEDL;
 double Pd_LEDR;
 
+// to track cycle of timer
 int cycle = 0;
 
 // constant n_eff, Voltage out
@@ -74,7 +75,7 @@ ISR(TIMER1_COMPA_vect){
 
   // check Vt2 (every 150 ms) and recalc truck voltage vtruck
   if (cycle/240.0 >= 150.0){
-    Vt_2 = vin_convert.read();
+    double Vt_2 = vin_convert.read();
   } 
 
   // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measruing VT1 
