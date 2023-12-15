@@ -55,7 +55,7 @@ void setup() {
   voltage_calc_phase();
 
   // setup the Timer Interrupts
-  setup_timer1()
+  setup_timer1();
 
   // Set sleep mode to power save, Timer1 is still active in this mode
   set_sleep_mode(SLEEP_MODE_PWR_SAVE);

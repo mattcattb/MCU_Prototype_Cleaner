@@ -12,14 +12,16 @@ struct LED_Driver
 
     double current; // latest current value 
     
-    LED_Driver_Controller(double m = 1, double b = 0);
+    void LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int DSEL_val);
 
     void set_scaling(double m, double b);
 
     void pin_setup();
-    void LED_Driver_Control();
+    LED_Driver();
 
     void write(int ch_0, int ch_1); // set LEDL, LEDR channels
+    void write(); // uses the preset states 
+
     double read(int n = 1); // get current reading amps
 
 };
@@ -28,8 +30,8 @@ LED_Driver::LED_Driver(){
   pin_setup();
 
   // start with all channels off
-  this->ch_0 = 0;
-  this->ch_1 = 0;
+  this->ch_0_state = 0;
+  this->ch_1_state = 0;
 }
 
 void LED_Driver::set_scaling(double m, double b){
@@ -71,17 +73,22 @@ void LED_Driver::LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int
   quick_digital_write(SCK_pin, DSEL_val);
 
   // read Current Sense for LED and save in IS pointer
-  this->IS_val = analogRead(SenseLED_pin);
+  this->current = analogRead(SenseLED_pin);
 
+}
+
+void LED_Driver::write(){ 
+    // set LEDL, LEDR channels using preset ch states
+    LED_Driver_Control(this->ch_0_state, this->ch_1_state, 1, 1);
 }
 
 void LED_Driver::write(int ch_0, int ch_1){ 
-    // set LEDL, LEDR channels
-    LED_Driver_Controller_Control(this->ch_0, this->ch_1, 1, 1)
+    // set LEDL, LEDR channels using current ch states
+    LED_Driver_Control(ch_0, ch_1, 1, 1);
 }
 
 double LED_Driver::read(int n){
-    // scale to get current reading in amps
+    // scale to get reading in amps over int n 
     double sum = 0;
     int analog_val;
     for(int i = 0; i < n; i += 1){

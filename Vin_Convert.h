@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include <cppQueue.h>
 #include "pins.h"
 
 // simplified Vin_Convert struct for a more functional based programming view
@@ -35,7 +34,7 @@ void Vin_Convert::set_scaling(double m, double b){
 
 int Vin_Convert::analog_read(){ 
     // 0-1023 basic analog read 
-    adc_reading = analog_read(IN150V);
+    adc_reading = analogRead(IN150V);
     
     return adc_reading;
 }
