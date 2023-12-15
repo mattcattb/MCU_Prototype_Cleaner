@@ -32,4 +32,13 @@ public:
     int get_L_Sense();
     int get_R_Sense();
 
+    void quick_digital_write(const int pin, int value){
+    // quickly does digital write on pin according to boolean value
+        if(value == 1){
+            digitalWrite(pin, HIGH); 
+        }else if(value == 0){
+            digitalWrite(pin, LOW);
+        }
+    }
+
 };

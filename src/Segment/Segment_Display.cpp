@@ -18,10 +18,10 @@ void Segment_Display::set_display(int value, int idx){
    enable_dot: turn on dot at end of segment display
   */
   
-  // set all low
-  analogWrite(SEG1, LOW);
-  analogWrite(SEG2, LOW);
-  analogWrite(SEG3, LOW);
+  // set all off (off is low macro)
+  analogWrite(SEG1_pin, OFF);
+  analogWrite(SEG2_pin, OFF);
+  analogWrite(SEG3_pin, OFF);
 
   uint8_t val_encoding = segment_encodings[value];
   
@@ -42,13 +42,13 @@ void Segment_Display::set_display(int value, int idx){
   // now send the signals to the proper segment
   switch(idx){
     case 0:
-      analogWrite(SEG1, HIGH);
+      analogWrite(SEG1_pin, ON);
       break;
     case 1:
-      analogWrite(SEG2, HIGH);
+      analogWrite(SEG2_pin, ON);
       break;
     case 2:
-      analogWrite(SEG3, HIGH);
+      analogWrite(SEG3_pin, ON);
       break;
   }
   
@@ -93,17 +93,17 @@ void Segment_Display::update_disp(double display_val){
 void Segment_Display::pin_setup(){
 
   // set seg switcher to output
-  pinMode(SEG1, OUTPUT);
-  pinMode(SEG2, OUTPUT);
-  pinMode(SEG3, OUTPUT);
+  pinMode(SEG1_pin, OUTPUT);
+  pinMode(SEG2_pin, OUTPUT);
+  pinMode(SEG3_pin, OUTPUT);
 
   // set digit pins to output
-  pinMode(D_A, OUTPUT);
-  pinMode(D_B, OUTPUT);
-  pinMode(D_C, OUTPUT);
-  pinMode(D_D, OUTPUT);
-  pinMode(D_E, OUTPUT);
-  pinMode(D_F, OUTPUT);
-  pinMode(D_G, OUTPUT);
-  pinMode(D_dp, OUTPUT);
+  pinMode(D_A_pin, OUTPUT);
+  pinMode(D_B_pin, OUTPUT);
+  pinMode(D_C_pin, OUTPUT);
+  pinMode(D_D_pin, OUTPUT);
+  pinMode(D_E_pin, OUTPUT);
+  pinMode(D_F_pin, OUTPUT);
+  pinMode(D_G_pin, OUTPUT);
+  pinMode(D_dp_pin, OUTPUT);
 }

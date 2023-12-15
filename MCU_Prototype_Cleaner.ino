@@ -38,20 +38,10 @@ Vin_Convert vin_convert;
 
 void setup() {
 
-  // scaling variables: 0v = 170Vin, 130V = 0Vin
-  int vin_scaleM = -8; // slope of 150V scaling
-  int vin_scaleB = 170; // y-intercept of 150V scaling
-
-  // scaling for LED current (0-1.5 amps) 
-  double led_scaleM = 1.5;
-  double led_scaleB = 0;
+  set_scalings()
 
   // begin serial communication 
   Serial.begin(9600);
-
-  // set scaling for Vin voltage and LED current
-  vin_convert.set_scaling(vin_scaleM, vin_scaleB);
-  led_driver.set_scaling(led_scaleM, led_scaleB);
 
   // calculate voltage and resistance values
   voltage_calc_phase();
@@ -69,6 +59,21 @@ void setup() {
 
 void loop() {
   sleep_mode(); 
+}
+
+
+void set_scalings(){
+    // scaling variables: 0v = 170Vin, 130V = 0Vin
+  int vin_scaleM = -8; // slope of 150V scaling
+  int vin_scaleB = 170; // y-intercept of 150V scaling
+
+  // scaling for LED current (0-1.5 amps) 
+  double led_scaleM = 1.5;
+  double led_scaleB = 0;
+
+  // set scaling for Vin voltage and LED current
+  vin_convert.set_scaling(vin_scaleM, vin_scaleB);
+  led_driver.set_scaling(led_scaleM, led_scaleB);
 }
 
 ISR(TIMER1_COMPA_vect){

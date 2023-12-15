@@ -1,7 +1,7 @@
 #include "Vin_Convert.h"
 
 Vin_Convert::Vin_Convert(double m, double b){
-    pinMode(IN150V, INPUT);
+    pinMode(IN150V_pin, INPUT);
     scaleM = m;
     scaleB = b;
 }
@@ -13,7 +13,7 @@ void Vin_Convert::set_scaling(double m, double b){
 
 int Vin_Convert::analog_read(){ 
     // 0-1023 basic analog read 
-    adc_reading = analogRead(IN150V);
+    adc_reading = analogRead(IN150V_pin);
     
     return adc_reading;
 }

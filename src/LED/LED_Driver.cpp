@@ -16,8 +16,8 @@ void LED_Driver::set_scaling(double m, double b){
 
 void LED_Driver::pin_setup(){
     // led driver pin setup
-    pinMode(MOSI_pin, OUTPUT);
-    pinMode(MISO_pin, OUTPUT);
+    pinMode(IN0_LED_pin, OUTPUT);
+    pinMode(IN1_LED_pin, OUTPUT);
     pinMode(EN_LED_pin, OUTPUT);
     pinMode(SCK_pin, OUTPUT);
 
@@ -35,10 +35,10 @@ void LED_Driver::LED_Driver_Control(int in_0_val, int in_1_val, int DEN_val, int
    */
 
   // set channel 0 LED
-  quick_digital_write(MOSI_pin, in_0_val);
+  quick_digital_write(IN0_LED_pin, in_0_val);
 
   // set channel 1 LED
-  quick_digital_write(MISO_pin, in_1_val);
+  quick_digital_write(IN1_LED_pin, in_1_val);
 
   // set Diagnostic Enabler
   quick_digital_write(EN_LED_pin, DEN_val);

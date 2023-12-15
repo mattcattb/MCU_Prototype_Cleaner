@@ -9,9 +9,9 @@ Motor_Driver::Motor_Driver(){
 
 void Motor_Driver::pin_setup(){
     // set pins i/o
-    pinMode(M_D_R, OUTPUT);
-    pinMode(M_D_L, OUTPUT);
-    pinMode(M_EN, OUTPUT);
+    pinMode(M_D_R_pin, OUTPUT);
+    pinMode(M_D_L_pin, OUTPUT);
+    pinMode(M_EN_pin, OUTPUT);
     pinMode(SenseMR_pin, INPUT);
     pinMode(SenseML_pin, INPUT);
 
@@ -70,13 +70,13 @@ void Motor_Driver::Motor_Driver_Control(int in_L, int in_R, int INH){
     */
 
     // set left motor
-    quick_digital_write(M_D_L, in_L);
+    quick_digital_write(M_D_L_pin, in_L);
 
     // set right motor
-    quick_digital_write(M_D_R, in_R);
+    quick_digital_write(M_D_R_pin, in_R);
 
     // set inhibit
-    quick_digital_write(M_EN, INH);
+    quick_digital_write(M_EN_pin, INH);
 
     // write sense variables
     this->L_Sense = analogRead(SenseML_pin);

@@ -24,4 +24,14 @@ struct LED_Driver
 
     double read(int n = 1); // get current reading amps
 
+    void quick_digital_write(const int pin, int value){
+    // quickly does digital write on pin according to boolean value
+        if(value == 1){
+            digitalWrite(pin, HIGH); 
+        }else if(value == 0){
+            digitalWrite(pin, LOW);
+        }
+    }
+
 };
+

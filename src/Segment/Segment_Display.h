@@ -4,8 +4,15 @@
 
 class Segment_Display{
 
-  uint8_t segment_pins[7] = {D_A, D_B, D_C, D_D, D_E, D_F, D_G}; // array of segment pin addresses
-  uint8_t segment_encodings[10] ={0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011, 0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1110011}; // encodings for each number
+  const uint8_t ON = LOW;
+  const uint8_t OFF = HIGH;
+
+  // array of segment pin addresses
+  uint8_t segment_pins[7] = {D_A_pin, D_B_pin, D_C_pin, D_D_pin, D_E_pin, D_F_pin, D_G_pin}; 
+
+  // encodings for each number, for segments 0bABCDEFG being on or off (here, 0 is on, 1 is off)
+  //                                  0           1         2          3          4           5         6         7           8           9
+  uint8_t segment_encodings[10] = {0b0000001, 0b1001111, 0b0010010, 0b0000110, 0b1001100, 0b0100100, 0b0100000, 0b0001111, 0b0000000, 0b0001100}
 
   unsigned long seg_delay = 2; // ms delay between segment displays
   unsigned long prev_time; 
@@ -24,4 +31,14 @@ public:
   Segment_Display();
   void update_disp(double display_val); // update if timing correct
 
+  void quick_digital_write(const int pin, int value){
+  // quickly does digital write on pin according to boolean value
+      if(value == 1){
+          digitalWrite(pin, HIGH); 
+      }else if(value == 0){
+          digitalWrite(pin, LOW);
+      }
+  }
+
 };
+
