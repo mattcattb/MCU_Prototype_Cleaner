@@ -9,6 +9,7 @@
 
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <cppQueue.h>
 
 void setup_timer1();
 void voltage_calc_phase();
@@ -16,19 +17,25 @@ void voltage_calc_phase();
 // voltage of truck
 double Vt_truck;
 
-double R_Line; // resistance of line 
+// resistance of line 
+double R_Line; 
 
-// power 
+// power values
 double Pd_bias;
 double Pd_LEDL;
 double Pd_LEDR;
 
-// to track cycle of timer
-int cycle = 0;
+// rolling average queue of voltages taken from vin!
+int rolling_avg_size = 10; 
+cppQueue vt_truck_rolling_queue(sizeof(double), rolling_avg_size, LIFO);
+double vt_truck_avg; // rolling average value of vt_truck
 
 // constant n_eff, Voltage out
 const double n_eff = 0.7;
 const double Vt_out = 24;
+
+// track what cycle timer interupt is on 
+int cycle = 0;
 
 Motor_Driver motor_driver;
 LED_Driver led_driver;
@@ -61,30 +68,16 @@ void loop() {
   sleep_mode(); 
 }
 
-
-void set_scalings(){
-    // scaling variables: 0v = 170Vin, 130V = 0Vin
-  int vin_scaleM = -8; // slope of 150V scaling
-  int vin_scaleB = 170; // y-intercept of 150V scaling
-
-  // scaling for LED current (0-1.5 amps) 
-  double led_scaleM = 1.5;
-  double led_scaleB = 0;
-
-  // set scaling for Vin voltage and LED current
-  vin_convert.set_scaling(vin_scaleM, vin_scaleB);
-  led_driver.set_scaling(led_scaleM, led_scaleB);
-}
-
 ISR(TIMER1_COMPA_vect){
   // timer 1 at 240 hz
 
   // check Vt2 (every 150 ms) and recalc truck voltage vtruck
   if (cycle/240.0 >= 150.0){
     double Vt_2 = vin_convert.read();
+    // add this to the rolling average queue!
   } 
 
-  // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measruing VT1 
+  // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measuring VT1 
   // turning LED back on and using equation 7 to recalculate Pdbias
   // turn motor to raise the lift if there is minimal change in pdbias
 
@@ -103,6 +96,35 @@ ISR(TIMER1_COMPA_vect){
   cycle ++; 
 }
 
+
+// Loop Functions
+
+double calculate_truck_voltage(){
+  // todo properly calculate Vt_truck
+  /* 
+  this uses the vin object and already calculated equations to get the true voltage of the truck 
+  
+  voltage is impacted by: 
+    - what lights are on
+    -
+  
+  */
+
+  double vin_value = vin_convert.read();
+
+  return vin_value;
+}
+
+void change_segment_state(){
+  // if enough time has passed, change the segment state
+}
+
+void set_segment_display(double value){
+  // change what value is being displayed on LED
+}
+
+// Setup Functions
+
 void setup_timer1(){
 
   cli(); // stop interupts
@@ -118,6 +140,20 @@ void setup_timer1(){
 
   sei(); // enable interupts again 
 
+}
+
+void set_scalings(){
+    // scaling variables: 0v = 170Vin, 130V = 0Vin
+  int vin_scaleM = -8; // slope of 150V scaling
+  int vin_scaleB = 170; // y-intercept of 150V scaling
+
+  // scaling for LED current (0-1.5 amps) 
+  double led_scaleM = 1.5;
+  double led_scaleB = 0;
+
+  // set scaling for Vin voltage and LED current
+  vin_convert.set_scaling(vin_scaleM, vin_scaleB);
+  led_driver.set_scaling(led_scaleM, led_scaleB);
 }
 
 void voltage_calc_phase(){
@@ -164,7 +200,7 @@ void voltage_calc_phase(){
   
   while(curMillis < start_millis + interval){
     
-    Vt_2 = 
+    // Vt_2 = 
     curMillis = millis();
   } 
 

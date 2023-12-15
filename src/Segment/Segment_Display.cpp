@@ -1,19 +1,57 @@
 #include "Segment_Display.h"
 
+// ======= public Functions =======
+
 Segment_Display::Segment_Display(){
   // set pins
   pin_setup();
+
+  // first value to be displayed is 0
+  this->display_value = 0; 
 
   this->prev_time = millis();
 
 }
 
-void Segment_Display::set_display(int value, int idx){
+
+void Segment_Display::update_state(){
+  // if enough time has passed, cycle state and turn on that digit
+  
+  this->cur_time = millis();
+
+  if(this->cur_time - this->prev_time > this->seg_delay){
+    // turn on specific digit to the reading
+
+    // prev time is now cur_time
+    this->prev_time = this->cur_time;
+
+    // get specific digit from display_value to be displayed
+    int digit_idx = this->num_states - this->state;
+    int digit = get_digit(this->display_value, digit_idx);
+
+    // set that display to the number 
+    set_display_digit(state, digit);
+
+    // increase state
+    state = (state + 1)%(num_states);
+  }
+
+}
+
+void Segment_Display::set_display_value(double val){
+  // sets what value to be displayed
+  // TODO incorporate errors to be displayed!
+  this->display_value = val;
+
+}
+
+// ======= private Functions =======
+
+void Segment_Display::set_display_digit(int value, int idx){
   /*
+   set display digit of idx to value 
 
-   set display idx to value 
-
-   value: what number to set 7 seg to 
+   value: what number to set 7 seg to (0 to 9)
    display_idx: which segment to turn on. 0, 1, 2 
    enable_dot: turn on dot at end of segment display
   */
@@ -55,7 +93,8 @@ void Segment_Display::set_display(int value, int idx){
 }
 
 int Segment_Display::get_digit(double value, int digit_idx){
-  // get the digit at the digit_idx of the display_val
+  // helper to get the digit at the digit_idx of the display_val
+  
   for(int i = 0; i < digit_idx; i += 1){
     value = value/10.0;  
   }
@@ -66,31 +105,8 @@ int Segment_Display::get_digit(double value, int digit_idx){
   return digit;
 }
 
-
-void Segment_Display::update_disp(double display_val){
-  // see if enough time has passed, if so, turn on segment to the reading and go to next state
-  this->cur_time = millis();
-
-  if(this->cur_time - this->prev_time > this->seg_delay){
-    // turn on specific digit to the reading
-
-    // prev time is now cur_time
-    this->prev_time = this->cur_time;
-
-    // get the digit to display 
-    int digit_idx = this->num_states - this->state;
-    int digit = get_digit(display_val, digit_idx);
-
-    // set that display to the number 
-    set_display(state, digit);
-
-    // increase state
-    state = (state + 1)%(num_states);
-  }
-
-}
-
 void Segment_Display::pin_setup(){
+  // initialize all pins during setup
 
   // set seg switcher to output
   pinMode(SEG1_pin, OUTPUT);
@@ -107,3 +123,4 @@ void Segment_Display::pin_setup(){
   pinMode(D_G_pin, OUTPUT);
   pinMode(D_dp_pin, OUTPUT);
 }
+

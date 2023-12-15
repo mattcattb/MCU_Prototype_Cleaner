@@ -3,6 +3,7 @@
 #include "../pins.h"
 
 // simplified Vin_Convert struct for a more functional based programming view
+// TODO add a rolling average for readings
 
 struct Vin_Convert{
 
@@ -12,11 +13,11 @@ struct Vin_Convert{
     double adc_reading; // latest adc 10bit value 
     double voltage_reading; // latest voltage value
 
+    // initialization function
     Vin_Convert(double m = 1, double b = 0);
-    
     void set_scaling(double m, double b);
-    int analog_read(); // 0-1023V analog read 
 
+    int analog_read(); // 0-1023V analog raw reading 
     double read(int n = 1); // reading average over n readings
 
     void quick_digital_write(const int pin, int value){
