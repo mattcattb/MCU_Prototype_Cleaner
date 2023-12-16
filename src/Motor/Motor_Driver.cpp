@@ -17,38 +17,21 @@ void Motor_Driver::pin_setup(){
 
 }
 
-void Motor_Driver::update(){
-    // update motor if enough time has passed
-
-    this->cur_time = millis();
-
-    if (this->cur_time - this->prev_time > this->reading_delay){
-        // write to motor currently set state
-        this->prev_time = this->cur_time;
-        write_state();
-
-    }
-}
-
 void Motor_Driver::write_state(){
     // write to motor driver based on state
 
     switch (this->state)
     {
-    case 0: // sleep
+    case OFF: // sleep
         Motor_Driver_Control(0, 0, 0);
         break;
-    
-    case 1: // brake
-        Motor_Driver_Control(1, 0, 0);
-        break;
 
-    case 2: // left
-        Motor_Driver_Control(1, 1, 0);
-        break;
-
-    case 3: // right
+    case LEFT: // left
         Motor_Driver_Control(1, 0, 1);
+        break;
+
+    case RIGHT: // right
+        Motor_Driver_Control(0, 1, 1);
         break;
 
     }

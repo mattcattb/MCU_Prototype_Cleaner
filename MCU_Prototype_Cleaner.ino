@@ -26,16 +26,13 @@ double Pd_LEDL;
 double Pd_LEDR;
 
 // rolling average queue of voltages taken from vin!
-int rolling_avg_size = 10; 
-cppQueue vt_truck_rolling_queue(sizeof(double), rolling_avg_size, LIFO);
-double vt_truck_avg; // rolling average value of vt_truck
+int queue_max_size = 10; 
+double vt_truck_avg = 0; // rolling average value of vt_truck
+cppQueue vt_truck_rolling_queue(sizeof(double), queue_max_size, LIFO);
 
 // constant n_eff, Voltage out
 const double n_eff = 0.7;
 const double Vt_out = 24;
-
-// track what cycle timer interupt is on 
-int cycle = 0;
 
 Motor_Driver motor_driver;
 LED_Driver led_driver;
@@ -45,7 +42,10 @@ Vin_Convert vin_convert;
 
 void setup() {
 
-  set_scalings()
+  // take a 10 second delay first
+  delay(10000);
+
+  set_scalings();
 
   // begin serial communication 
   Serial.begin(9600);
@@ -70,60 +70,124 @@ void loop() {
 
 ISR(TIMER1_COMPA_vect){
   // timer 1 at 240 hz
+  // this loop executes 240 times a second, or every 0.0041 seconds (4 ms)
 
-  // check Vt2 (every 150 ms) and recalc truck voltage vtruck
-  if (cycle/240.0 >= 150.0){
-    double Vt_2 = vin_convert.read();
-    // add this to the rolling average queue!
-  } 
-
-  // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measuring VT1 
-  // turning LED back on and using equation 7 to recalculate Pdbias
-  // turn motor to raise the lift if there is minimal change in pdbias
-
-  // if Vtruck decreases from above 160V to below 155V stop raising the lift (turn motor off)
-
-  // if Vtruck decreases to 150V check Pdbias val by turning off one LED, waiting 50ms measuring VT1 turning LED back on and 
-  // then using equation 7 to recalculate the Pdbias
-  // turn the motor on to lower lift if there is "minimal" change in pdbias
-
-  // if truck voltage incrased from below 150V to 155V stop lowering the lift (turn motor off)
+  take_reading();
   
+  display_voltage();
 
+  change_segment_state(); 
 
-  // display scaled reading
-  seg_disp.update_disp(100);
-  cycle ++; 
+  update_motor_state();
+
+  motor_driver.update();
+
 }
 
 
-// Loop Functions
+// ===== Loop Functions =====
 
-double calculate_truck_voltage(){
-  // todo properly calculate Vt_truck
-  /* 
-  this uses the vin object and already calculated equations to get the true voltage of the truck 
+// TODO figure out how to determine if action should be updated or not!
+
+void take_reading(){
+  // if enough time has passed, take in reading!
+
+  bool ready_to_update = true;
+
+  if (ready_to_update){
+    // TCNT1 is a cycle value 
+    
+    // TODO properly calculate vt_2 using pdbias, pdL and pdR, and RLine
+    double vt_2 = vin_convert.read();
+    double vt_truck = two_load_V_truck(vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
+
+    // add this to the rolling average queue!
+    update_rolling_avg(vt_truck);
+  } 
+}
+
+// macros for motor states
+#define OFF 0
+#define LEFT 1
+#define RIGHT 2
+
+void update_motor_state(){
+
+  // change motor if enough time using vt_truck_avg (every 150ms?)
+
+  // 0: sleep, 1: brake, 2: left, 3: right
+  bool ready_to_update = true;
+
+  if (ready_to_update){
+
+    if (vt_truck_avg >= 160){
+      // if truck increases to 160V, check Pdbias val by turning off 1 LED (alternate), waiting 50ms measuring VT1 
+      // turning LED back on and using equation 7 to recalculate Pdbias
+      // turn motor to raise the lift (go right)
+      
+      motor_driver.set_state(RIGHT);
+    }
+
+    else if (vt_truck_avg < 140 && vt_truck_avg > 105){
+      // if Vtruck decreases to 150V check Pdbias val by turning off one LED, waiting 50ms measuring VT1 turning LED back on and 
+      // then using equation 7 to recalculate the Pdbias
+      // turn the motor on to lower lift (go left) 
+      motor_driver.set_state(LEFT);
+
+    }
+    
+    else{
+      // if Vtruck decreases from above 160V to below 155V stop raising the lift (turn motor off)
+      // if truck voltage incrased from below 150V to 155V stop lowering the lift (turn motor off)
+      motor_driver.set_state(OFF);
+
+    }
+
+  }
   
-  voltage is impacted by: 
-    - what lights are on
-    -
+}
+
+void display_voltage(){
+  // display voltage to segment display and maybe change state (if enough time has passed)
+  bool ready_to_update = true;
   
-  */
+  if (ready_to_update){
+    seg_disp.update_state();
+  }
 
-  double vin_value = vin_convert.read();
-
-  return vin_value;
 }
 
 void change_segment_state(){
-  // if enough time has passed, change the segment state
+  // if enough time has passed, change the segment state to the current average
+  bool ready_to_update = true;
+
+  if (ready_to_update){
+    seg_disp.set_display_value(vt_truck_avg);
+  }
+
 }
 
-void set_segment_display(double value){
-  // change what value is being displayed on LED
+
+// ===== Helpers =====
+
+void update_rolling_avg(double vt2_voltage){
+  // updates rolling average queue based on new vt2 voltage
+
+  if (!vt_truck_rolling_queue.isFull()){
+    // if queue isnt full, just add it to queue and add divided value to queue 
+    vt_truck_rolling_queue.push(&vt2_voltage);
+    vt_truck_avg = vt_truck_avg + vt2_voltage/vt_truck_rolling_queue.getCount();
+  
+  }else{
+    // queue is full, so must remove from it first to then add new voltage
+    double removed_voltage; 
+    vt_truck_rolling_queue.pop(&removed_voltage);
+    vt_truck_rolling_queue.push(&vt2_voltage);
+    vt_truck_avg = vt_truck_avg + vt2_voltage/queue_max_size - removed_voltage/queue_max_size;
+  }
 }
 
-// Setup Functions
+// ===== Setup Functions =====
 
 void setup_timer1(){
 

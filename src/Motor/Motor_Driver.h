@@ -2,11 +2,12 @@
 #include <Arduino.h>
 #include "../pins.h"
 
-class Motor_Driver{
+#define OFF 0
+#define LEFT 1
+#define RIGHT 2
 
-    unsigned long reading_delay = 20; // how long to wait between readings
-    unsigned long prev_time = 0;
-    unsigned long cur_time;
+
+class Motor_Driver{
 
     int L_Sense;
     int R_Sense;
@@ -17,16 +18,16 @@ class Motor_Driver{
     void pin_setup();
     void Motor_Driver_Control(int in_L, int in_R, int INH); // motor control
 
-    // write stored state to motor driver
-    void write_state();
 
 public:
 
     Motor_Driver(); // constructor for motor driver
-    void update(); // update based on delay
 
-    void set_state(int state); // set state
+    // set state of motor (0: sleep, 1: brake, 2: left, 3: right)
+    void set_state(int state); 
 
+    // write stored state to motor driver
+    void write_state();
     
     // get L_sense or R_Sense
     int get_L_Sense();
