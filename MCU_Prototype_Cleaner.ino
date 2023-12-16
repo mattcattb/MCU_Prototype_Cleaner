@@ -87,7 +87,7 @@ ISR(TIMER1_COMPA_vect){
   vin_convert.update_reading();
 
   // get already stored scaled reading
-  double vin_reading_scaled = vin_convert.latest_reading();
+  double vin_avg_scaled = vin_convert.get_latest_reading();
 
   // display this scaled reading if possible
   seg_disp.update_disp(vin_reading_scaled);
@@ -163,4 +163,6 @@ void voltage_calc_phase(){
   // Vt_truck = 
 
   // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
+  seg_disp.update_disp(vin_avg_scaled);
+
 }

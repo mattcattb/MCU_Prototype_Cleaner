@@ -12,18 +12,17 @@ class Vin_Convert{
     int scaleM = 0;
     int scaleB = 0;
 
-    // latest reading
+    // latest readings 
     double latest_reading; // scaled reading according to scalM and scaleB
+    double rolling_average = 0; // average of volt_scaled_data
 
     unsigned long reading_delay = 20; // take reading every 20 ms
     unsigned long prev_time; 
     unsigned long cur_time;
 
     int window_size = 10; // number of averages to take for reading
-    double rolling_average = 0; // average of volt_scaled_data
 
     // (size_t size_rec, uint16_t nb_recs=20, QueueType type=FIFO, bool overwrite=false, void * pQDat=NULL, size_t lenQDat=0
-
     cppQueue *volt_scaled_queue; // pointer to queue of readings
 
     int analog_read(); // digital read from i/o pin
@@ -34,7 +33,6 @@ class Vin_Convert{
 
 public:
 
-    double analog_read_scaled(); // take a scaled voltage reading and return it
 
     Vin_Convert();
     Vin_Convert(int window_size, int delay_time);
@@ -46,11 +44,11 @@ public:
     void update_reading();
 
     // average of last 10 readings
-    double get_reading(); // rolling average of last 10 readings
+    double get_latest_reading(); // rolling average of last 10 readings
 
 };
 
-Vin_Convert::latest_reading(){
+double Vin_Convert::get_latest_reading(){
     // return rolling average reading
     return this->rolling_average;
 }
@@ -68,14 +66,9 @@ Vin_Convert::Vin_Convert(){
 
     // set timing
     this->prev_time = millis();
-
 }
 
-
 Vin_Convert::Vin_Convert(int window_size, int delay_time){
-
-    // set input pins
-    pinMode(IN150V, INPUT);
 
     this->window_size = window_size;
     this->reading_delay = delay_time;
@@ -88,7 +81,6 @@ Vin_Convert::Vin_Convert(int window_size, int delay_time){
 
     // set timing
     this->prev_time = millis();
-
 }
 
 void Vin_Convert::set_scaling(double m, double b){
@@ -107,24 +99,23 @@ void Vin_Convert::update_reading(){
         volt_read();
         this->prev_time = this->cur_time;
     }
-
 }
 
 void Vin_Convert::calc_rolling_avg(){
     // use latest reading to update rolling average and queue
 
-    int queue_size = this->volt_scaled_queue->size();
+    int queue_size = this->volt_scaled_queue->getCount();
 
     if(queue_size > this->window_size){
         // if queue is too big, remove oldest reading and adjust average accordingly
-        double oldest_reading = volt_scaled_queue->front();
-        this->volt_scaled_queue->pop();
-        this->rolling_average -= ((oldest_reading) * (1/queue_size)); // remove from rolling average
+        double removed_val;
+        this->volt_scaled_queue->pop(&removed_val);
+        this->rolling_average -= ((removed_val) * (1/queue_size)); // remove from rolling average
     }
 
-    this->volt_scaled_queue->push(this->latest_reading); // add latest reading to queue
-    this->rolling_average += (this->latest_reading) * (1/this->window_size); // add to rolling average
-
+    int added_val = this->latest_reading;
+    this->volt_scaled_queue->push(&added_val); // add latest reading to queue
+    this->rolling_average += (added_val) * (1/this->window_size); // add to rolling average
 
 }
 
