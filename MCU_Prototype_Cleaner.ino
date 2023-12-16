@@ -82,14 +82,6 @@ ISR(TIMER1_COMPA_vect){
 
   motor_driver.update();
 
-<<<<<<< HEAD
-  // get already stored scaled reading
-  double vin_avg_scaled = vin_convert.get_latest_reading();
-
-  // display this scaled reading if possible
-  seg_disp.update_disp(vin_reading_scaled);
-=======
->>>>>>> Src-Organized-Filestructure
 }
 
 
