@@ -34,6 +34,7 @@ cppQueue vt_truck_rolling_queue(sizeof(double), queue_max_size, LIFO);
 const double n_eff = 0.7;
 const double Vt_out = 24;
 
+// control objects
 Motor_Driver motor_driver;
 LED_Driver led_driver;
 
@@ -79,8 +80,6 @@ ISR(TIMER1_COMPA_vect){
   change_segment_state(); 
 
   update_motor_state();
-
-  motor_driver.update();
 
 }
 
@@ -143,8 +142,9 @@ void update_motor_state(){
 
     }
 
+    motor_driver.update();
+
   }
-  
 }
 
 void display_voltage(){
@@ -268,10 +268,7 @@ void voltage_calc_phase(){
     curMillis = millis();
   } 
 
-<<<<<<< HEAD
   // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
   seg_disp.update_disp(vin_avg_scaled);
 
-=======
->>>>>>> Src-Organized-Filestructure
 }

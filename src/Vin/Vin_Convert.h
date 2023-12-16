@@ -3,7 +3,6 @@
 #include "../pins.h"
 
 // simplified Vin_Convert struct for a more functional based programming view
-// TODO add a rolling average for readings
 
 struct Vin_Convert{
 
