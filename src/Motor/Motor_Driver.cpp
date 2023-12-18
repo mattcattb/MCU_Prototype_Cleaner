@@ -2,8 +2,7 @@
 
 Motor_Driver::Motor_Driver(){
     pin_setup();
-    this->prev_time = millis();
-    this->state = 0; // current state is sleep
+    this->state = OFF; // current state is sleep
     write_state(); // write motor to sleep
 }
 
