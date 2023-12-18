@@ -16,6 +16,16 @@ Memory model            : Small
 External RAM size       : 0
 Data Stack size         : 512
 *******************************************************************************/
+
+/*
+	TODO
+	- use sense to calculate R_line, Pd_LEDL, Pd_LEDR, Pd_bias
+	- setup rolling average (using queue)
+	- possibly add timing checks for vin 
+	- maybe seperate functions into other files
+
+*/
+
 // I/O Registers definitions
 #include <mega328p.h>
 // Delay functions
@@ -25,6 +35,8 @@ Data Stack size         : 512
 unsigned int read_adc(unsigned char adc_input);
 void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double *Pd_bias);
 
+void motor_loop(double In150V_Val); // 
+
 // circuit functions
 void control_LED (unsigned char Led1, unsigned char Led2); // 1 = ON  0 = OFF
 void Show_Value (unsigned int In);
@@ -32,7 +44,6 @@ void Motor_R_L_Off (unsigned char Motor);
 float read_vin_volt();
 
 // equations functions
-
 double no_load_V_truck(double Vt_0, double Pd_bias, double R_line);
 double one_load_V_truck(double Vt_1, double Pd_bias, double Pd_LEDL, double R_line);
 double two_load_V_truck(double Vt_2, double Pd_bias, double Pd_LEDL, double Pd_LEDR, double R_line);
@@ -146,6 +157,77 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 // ADC Voltage Reference: Int., cap. on AREF
 #define ADC_VREF_TYPE ((1<<REFS1) | (1<<REFS0) | (0<<ADLAR))
 
+//=============================================================================
+void main(void)
+{
+#include <Init.c>
+
+	// power variables
+	double Pd_bias;
+	double Pd_LEDL;
+	double Pd_LEDR;
+
+	// voltage of truck
+	double Vt_truck;
+
+	// resistance of line 
+	double R_Line; 
+
+	// configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
+	calculate_voltages(&R_Line, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
+
+	// turn both LEDs on 
+	control_LED(ON, ON);
+
+	while (1)
+	{
+      //Show_Value(InPout150V);
+
+      //Show_Value(read_adc(Sens150Vin));
+      //Show_Value(read_adc(Sens_LEDS));
+      //Show_Value(read_adc(Sens_Motor));
+
+      //Show_Value(((read_adc(Sens150Vin) / 10) + 100)); 
+    
+	  // get reading from ADC
+	  InPout150V = read_vin_volt(vin_scaleM, vin_scaleB);
+      
+	  // calculate truck voltage from ADC reading
+	  double truck_voltage = calculate_truck_voltage(InPout150V, R_Line, Pd_LEDL, Pd_LEDR, Pd_bias);
+
+	  // set value to be shown on 7-seg display
+	  Show_Value(truck_voltage); 
+
+	  // control motor based on reading
+      motor_loop(truck_voltage);
+
+	}
+}
+//=============================================================================
+//=============================================================================
+
+double calculate_truck_voltage(double vin_150v, double R_Line, double Pd_LEDL, double Pd_LEDR, double Pd_bias)
+{
+	// use the vin_150v and variables to determine the trucks voltage given 
+	double vt_truck;
+
+	// determine which equation to use based on what LEDs turned on 
+	if (IN0_LED == 1 && IN1_LED == 1){
+		// both LEDs are on (vt2 equation)
+		vt_truck = two_load_V_truck(vin_150v, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
+
+	}else if (IN0_LED == 1 || IN1_LED == 1){
+		// one of the LEDs are on (vt1 equation)
+		vt_truck = one_load_V_truck(vin_150v, Pd_bias, Pd_LEDL, R_Line);
+	}else{
+		// no LEDs are on (vt0 equation)
+		vt_truck = no_load_V_truck(vin_150v, Pd_bias, R_Line);
+	}
+
+	return vt_truck;
+}
+
+
 void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double *Pd_bias)
 {
 	// calculate R_line, Vt_truck, Pd_LEDL, Pd_LEDR
@@ -188,64 +270,6 @@ void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double
 	//! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 
 }
-
-//=============================================================================
-void main(void)
-{
-#include <Init.c>
-
-	// power variables
-	double Pd_bias;
-	double Pd_LEDL;
-	double Pd_LEDR;
-
-	// voltage of truck
-	double Vt_truck;
-
-	// resistance of line 
-	double R_Line; 
-
-	// configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
-	calculate_voltages(&R_Line, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
-
-	// turn both LEDs on 
-	control_LED(ON, ON);
-
-
-	while (1)
-		{
-      //Show_Value(InPout150V);
-
-      //Show_Value(read_adc(Sens150Vin));
-      //Show_Value(read_adc(Sens_LEDS));
-      //Show_Value(read_adc(Sens_Motor));
-
-      //Show_Value(((read_adc(Sens150Vin) / 10) + 100)); 
-    
-	  // get reading from ADC
-	  InPout150V = read_vin_volt(vin_scaleM, vin_scaleB);
-      Show_Value(InPout150V); 
-      
-      if(InPout150V > 160)
-       {
-        Motor_R_L_Off(Right);// Right Left OFF 
-        // cheek motor curent
-       }
-      
-      else if((InPout150V < 140) && (InPout150V > 105))
-       {
-        Motor_R_L_Off(Left);// Right Left OFF 
-       }
-      
-      else
-       {
-        Motor_R_L_Off(OFF);// Right Left OFF 
-       }
-
-		}
-}
-//=============================================================================
-//=============================================================================
 
 void Motor_R_L_Off (unsigned char Motor)// 1 = ON  0 = OFF
 {
@@ -340,6 +364,26 @@ float read_vin_volt(int n)
 	}
 
 	return sum_vin/n;
+}
+
+void motor_loop(double In150V_Val)
+{
+	// control motor according to the In150V_Val
+	if(In150V_Val > 160)
+	{
+		Motor_R_L_Off(Right);// Right Left OFF 
+		// cheek motor curent
+	}
+
+	else if((In150V_Val < 140) && (In150V_Val > 105))
+	{
+		Motor_R_L_Off(Left);// Right Left OFF 
+	}
+
+	else
+	{
+		Motor_R_L_Off(OFF);// Right Left OFF 
+	}
 }
 
 // ======================== Electrical Equations ==============================
