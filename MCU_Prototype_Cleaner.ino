@@ -21,7 +21,7 @@ double Vt_truck;
 double R_Line; 
 
 // power values
-double Pd_bias;
+double Pd_bias;  
 double Pd_LEDL;
 double Pd_LEDR;
 
@@ -43,16 +43,18 @@ Vin_Convert vin_convert;
 
 void setup() {
 
-  // take a 10 second delay first
-  delay(10000);
+  // begin serial communication 
+  // Serial.begin(9600);
+  // Serial.println("beginning setup phase!");
+
+  // take a 1 second delay first
+  delay(1000);
 
   set_scalings();
 
-  // begin serial communication 
-  Serial.begin(9600);
-
   // calculate voltage and resistance values
   voltage_calc_phase();
+  // Serial.println("finished voltage calc phase!");
 
   // setup the Timer Interrupts
   setup_timer1();
@@ -62,6 +64,8 @@ void setup() {
 
   // Enable sleep mode
   sleep_enable();
+
+  //todo wait for readings to be small enough
 
 }
 
@@ -83,7 +87,6 @@ ISR(TIMER1_COMPA_vect){
 
 }
 
-
 // ===== Loop Functions =====
 
 // TODO figure out how to determine if action should be updated or not!
@@ -95,10 +98,8 @@ void take_reading(){
 
   if (ready_to_update){
     // TCNT1 is a cycle value 
-    
-    // TODO properly calculate vt_2 using pdbias, pdL and pdR, and RLine
-    double vt_2 = vin_convert.read();
-    double vt_truck = two_load_V_truck(vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
+
+    double vt_truck = get_truck_voltage();
 
     // add this to the rolling average queue!
     update_rolling_avg(vt_truck);
@@ -142,7 +143,8 @@ void update_motor_state(){
 
     }
 
-    motor_driver.update();
+    // now tell motor to act out that state
+    motor_driver.write_state();
 
   }
 }
@@ -185,6 +187,14 @@ void update_rolling_avg(double vt2_voltage){
     vt_truck_rolling_queue.push(&vt2_voltage);
     vt_truck_avg = vt_truck_avg + vt2_voltage/queue_max_size - removed_voltage/queue_max_size;
   }
+}
+
+double get_truck_voltage(){
+    // use vin to get voltage, and then use variables to get actual values
+    
+    double vt_2 = vin_convert.read();
+    double vt_truck = two_load_V_truck(vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
+    return vt_truck;
 }
 
 // ===== Setup Functions =====
@@ -256,19 +266,9 @@ void voltage_calc_phase(){
   // using equation 3 measure truck voltage Vtruck
   Vt_truck = two_load_V_truck(Vt_2, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
 
-  //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-
-  unsigned long interval = 100;
-  unsigned long start_millis = millis();
-  unsigned long curMillis = millis();
-  
-  while(curMillis < start_millis + interval){
-    
-    // Vt_2 = 
-    curMillis = millis();
-  } 
+  //todo keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 
   // keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-  seg_disp.update_disp(vin_avg_scaled);
+  seg_disp.set_display_value(Vt_truck);
 
 }
