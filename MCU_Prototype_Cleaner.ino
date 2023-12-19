@@ -42,14 +42,14 @@ Segment_Display seg_disp;
 Vin_Convert vin_convert;
 
 void setup() {
-
-  // begin serial communication 
-  // Serial.begin(9600);
-  // Serial.println("beginning setup phase!");
-
-  // take a 1 second delay first
+ 
   delay(1000);
 
+  digitalWrite(SEG1_pin, HIGH);
+  digitalWrite(D_A_pin, HIGH);
+
+  delay(1000);
+  
   set_scalings();
 
   // calculate voltage and resistance values
