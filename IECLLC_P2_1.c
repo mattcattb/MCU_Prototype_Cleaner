@@ -34,8 +34,7 @@ Data Stack size         : 512
 // helper functions
 unsigned int read_adc(unsigned char adc_input);
 void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double *Pd_bias);
-
-void motor_loop(double In150V_Val); // 
+void motor_loop(double In150V_Val); 
 
 // circuit functions
 void control_LED (unsigned char Led1, unsigned char Led2); // 1 = ON  0 = OFF
@@ -80,7 +79,8 @@ double R_LINE_EQ_Two(double vt_0, double vt_1, double vt_2, double Pd_LEDL, doub
 #define IN1_LED PORTB.4
 #define SEL_LED PORTB.5
 #define EN_LED  PORTC.2
-
+#define SENSE_LED PORTC.1
+  
 // Motor
 #define M_D_R  PORTC.3
 #define M_D_L  PORTC.4
@@ -97,7 +97,7 @@ const double n_eff = 0.7;
 const double Vt_out = 24;
 
 double zero_buffer = 0.001;  // add to denominator to make sure never divide 0
-
+ 
 unsigned char DISPLAY_Counter = 0; // what digit to display
 unsigned char DISPLAY[4]; // digits for display
 unsigned char SegmentData[] =
@@ -121,7 +121,7 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 	Seg2 = 1;
 	Seg3 = 1;
 	if(DISPLAY_Counter == 0)
-		{
+		{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 		SegData = SegmentData[DISPLAY[1]];
 		DISPLAY_Counter++;
 		Seg3 = 0;
@@ -171,10 +171,10 @@ void main(void)
 	double Vt_truck;
 
 	// resistance of line 
-	double R_Line; 
+	double R_Line_val; 
 
 	// configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
-	calculate_voltages(&R_Line, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
+	calculate_voltages(&R_Line_val, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
 
 	// turn both LEDs on 
 	control_LED(ON, ON);
@@ -193,7 +193,7 @@ void main(void)
 	  InPout150V = read_vin_volt(vin_scaleM, vin_scaleB);
       
 	  // calculate truck voltage from ADC reading
-	  double truck_voltage = calculate_truck_voltage(InPout150V, R_Line, Pd_LEDL, Pd_LEDR, Pd_bias);
+	  double truck_voltage = calculate_truck_voltage(InPout150V, R_Line_val, Pd_LEDL, Pd_LEDR, Pd_bias);
 
 	  // set value to be shown on 7-seg display
 	  Show_Value(truck_voltage); 
@@ -242,7 +242,7 @@ void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double
 	// measure Vt1 and I_LED.left over 100 samples avg
 	double Vt_1 = read_vin_volt(100);
 	// todo set I_LED.left to 1A... ?
-	//! double I_LEDL = led_driver.read(100);
+	double I_LEDL = get_SENSE_led();
 
 	// turn right LED on (both on) and wait 50 ms
 	control_LED(1, 1);
@@ -250,7 +250,7 @@ void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double
 
 	// measure Vt2 and I_LED.right over 200 samples avg
 	double Vt_2 = read_vin_volt(200);
-	//! double I_LEDR = led_driver.read(200);
+	double I_LEDR = get_SENSE_led();
 
 	// calculate PdLEDL, PdLEDR, PdBias
 	*Pd_LEDL = (I_LEDL*Vt_out)/n_eff;
@@ -269,6 +269,17 @@ void voltage_calc_phase(double *R_line, double *Pd_LEDL, double *Pd_LEDR, double
 
 	//! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
 
+}
+
+double get_SENSE_led()
+{
+	// todo Make sure function works correctly at getting current from sense LED
+
+	const double max_current = 2.5; // max current in amps for scaling 
+	// read and scale sense voltage 
+	double sense_voltage = read_adc(Sens_LEDS);
+	double current = (sense_voltage/1024.0)*max_current; // make a 0-max_current amps reading
+	return current;
 }
 
 void Motor_R_L_Off (unsigned char Motor)// 1 = ON  0 = OFF
@@ -427,6 +438,12 @@ double Pd_bias_one_three(double Vt0, double Vt2, double Pd_LEDL, double Pd_LEDR,
 
 double Pd_bias_two_three(double Vt1, double Vt2, double Pd_LEDL, double Pd_LEDR, double R_line){
     // setting 1 load voltage truck equal to 2 load voltage truck equation
+	double val1 = (Vt1 - Vt2)/(R_line + zero_buffer);
+	double val2 = (Pd_LEDL+Pd_LEDR)/(Vt2 + zero_buffer);
+	double val3 = Pd_LEDL/(Vt1 + zero_buffer);
+	double denom = (Vt1 - Vt2)/(Vt1*Vt2 + zero_buffer);
+
+	return (val1 - val2 + val3)/(denom + zero_buffer);
 
 }
 
