@@ -2,7 +2,10 @@
 #define OFF 0
 
 #define Right  1 // up
+#define Up    1
+
 #define Left   2 // down
+#define Down 2
 
 // vin
 #define Sens150Vin  PORTC.0
@@ -33,7 +36,7 @@ float avg_read_vin_volt(int n);
 float get_SENSE_led();
 
 
-void Motor_R_L_Off (unsigned char Motor)// 2 = left, 1 = Right,  0 = OFF
+void Motor_R_L_Off (unsigned char Motor)// 2 = left(down), 1 = Right(up),  0 = OFF
 {
     if(Motor == Right)
     {             
@@ -54,6 +57,20 @@ void Motor_R_L_Off (unsigned char Motor)// 2 = left, 1 = Right,  0 = OFF
         M_D_L = 0;
         M_D_R = 0;
         M_EN  = 0;
+    }
+}
+
+int get_motor_state()
+{ 
+    // 2 down, 1 up, 0 off
+    if (M_D_L == 1 && M_D_R == 0){
+        return Left;
+    }
+    else if (M_D_L == 0 && M_D_R == 1){
+        return Right;
+    }
+    else{
+        return 0;
     }
 }
 

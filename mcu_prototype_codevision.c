@@ -226,15 +226,21 @@ void Show_Value (unsigned int In)
 
 void motor_loop(float In150V_Val)
 {
-    // control motor according to the In150V_Val
+    //! make this have latch functionality 
+
+    float latch_val = 150; 
+
+    // if voltage > 160, go up 
     if(In150V_Val > 160)
     {            
         // lift UP 
         Motor_R_L_Off(Right);// Right Left OFF 
-        // cheek motor curent
+
+        return;
     }
 
-    else if((In150V_Val < 140) && (In150V_Val > 105))
+    // if voltage between 140,105 go down 
+    if((In150V_Val < 140) && (In150V_Val > 105))
     {                                          
         // lift DOWN
         Motor_R_L_Off(Left);// Right Left OFF 
@@ -243,13 +249,24 @@ void motor_loop(float In150V_Val)
             // turn off one headlamp until lift stops moving
             control_LED(ON, OFF);
         } 
+        return;
     }
 
-    else
-    {         
-        // lift STOP
-        control_LED(ON,ON);    
+    if (get_motor_state == Up && (In150V_Val < latch_val)){
+        // motor is going up and latch was bypassed!
 
-        Motor_R_L_Off(OFF);// Right Left OFF 
+        // stop motor
+        Motor_R_L_Off(Off);
     }
+
+    if (get_motor_state == Down && (In150V_Val > latch_val)){
+        // motor is going down and latch was bypassed!
+
+        // stop motor
+        Motor_R_L_Off(Off);
+    }
+
+
 }
+
+
