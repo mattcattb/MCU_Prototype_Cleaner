@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>7.0</ProjectVersion>
     <ToolchainName>com.HPInfoTech.CodeVisionAVR.C</ToolchainName>
-    <ProjectGuid>{0E512FF1-423D-497C-A76A-A46C3F34E8A0}</ProjectGuid>
+    <ProjectGuid>{635FB7F3-423D-497C-A76A-A46C3F34E8A0}</ProjectGuid>
     <avrdevice>ATmega328P</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.cof</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>IECLLC_P2_1</AssemblyName>
-    <Name>IECLLC_P2_1</Name>
-    <RootNamespace>IECLLC_P2_1</RootNamespace>
+    <AssemblyName>mcu_prototype_codevision</AssemblyName>
+    <Name>mcu_prototype_codevision</Name>
+    <RootNamespace>mcu_prototype_codevision</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -36,21 +36,21 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
       <CV>
-        <CVProjectPath>"IECLLC_P2_1.prj"</CVProjectPath>
+        <CVProjectPath>"mcu_prototype_codevision.prj"</CVProjectPath>
       </CV>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <CV>
-        <CVProjectPath>"IECLLC_P2_1.prj"</CVProjectPath>
+        <CVProjectPath>"mcu_prototype_codevision.prj"</CVProjectPath>
       </CV>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IECLLC_P2_1.c">
+    <Compile Include="mcu_prototype_codevision.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

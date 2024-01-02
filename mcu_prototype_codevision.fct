@@ -1,0 +1,5 @@
+main DSTACK_USAGE:24 DSTACK_LEVEL:24 FILE:"mcu_prototype_codevision.c" LINE:119
+motor_loop DSTACK_USAGE:4 DSTACK_LEVEL:28 FILE:"mcu_prototype_codevision.c" LINE:240
+control_LED DSTACK_USAGE:4 DSTACK_LEVEL:32 FILE:"controllers.c" LINE:57
+timer0_ovf_isr DSTACK_USAGE:17 DSTACK_LEVEL:49 FILE:"mcu_prototype_codevision.c" LINE:72
+read_adc DSTACK_USAGE:2 DSTACK_LEVEL:51 FILE:"controllers.c" LINE:73
