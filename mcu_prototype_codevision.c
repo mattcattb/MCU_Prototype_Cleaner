@@ -30,7 +30,6 @@ Data Stack size         : 512
 #include <mega328p.h>
 // Delay functions
 #include <delay.h>
-#include <equations.c>
 #include <controllers.c>
 
 // 7-seg display
@@ -40,7 +39,6 @@ Data Stack size         : 512
 #define SegData PORTD
 
 // helper functions
-void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias);
 void motor_loop(float In150V_Val); 
 void Show_Value (unsigned int In);
 void steady_voltage();
@@ -107,12 +105,11 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
                  
     
     if(FreeCount++ >= n)
-        {
+    {
+        // calculate average once n readings have been reached
         FreeCount = 0;
         InPout150V = (AveInPout150V/n);
         AveInPout150V=0;    
-//            if(FreeCount2 == 0){LEDS_On_Off(OFF, OFF); FreeCount2 = 2; }
-//            else {LEDS_On_Off(ON, ON); FreeCount2 = 0; }
     } 
     
     //------------------------------ 
@@ -152,9 +149,10 @@ void main(void)
 
     while (1)
     {
+
         check_error_state();
         
-        // Vt_truck = calculate_truck_voltage(InPout150V, R_Line_val, Pd_LEDL, Pd_LEDR, Pd_bias);
+        //! make this more accurate!
         float temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
       
         // set value to be shown on 7-seg display
@@ -166,12 +164,6 @@ void main(void)
     }
 }
 
-float get_motor_current(){
-    // get motor current by measuring pin 19 
-    float Vread = read_adc(M_R_Sense);
-    float I_motor = (Vread - Vlm_0)/6.5;
-    return I_motor;
-}
 
 void check_error_state(){
     // make changes to error state 
@@ -197,54 +189,6 @@ void steady_voltage()
     }
     // finally, should be between 160 and 140 so return
     return;
-}
-
-void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias)
-{
-    float Vt_0, Vt_1, Vt_2, Vt_truck;   
-    float I_LEDL, I_LEDR;
-    // calculate R_line, Vt_truck, Pd_LEDL, Pd_LEDR
-
-    // measure vt0 through averaging 100 samples
-    Vt_0 = avg_read_vin_volt(100);
-
-    // turn left LED light and wait 30 ms
-    control_LED(1, 0);
-    delay_ms(30);
-
-    // measure Vt1 and I_LED.left over 100 samples avg
-    Vt_1 = avg_read_vin_volt(100);
-    // todo set I_LED.left to 1A... ?
-    I_LEDL = get_SENSE_led();
-
-    // turn right LED on (both on) and wait 50 ms
-    control_LED(1, 1);
-    delay_ms(50);
-
-    // measure Vt2 and I_LED.right over 200 samples avg
-    Vt_2 = avg_read_vin_volt(200);
-    I_LEDR = get_SENSE_led();
-
-    // calculate PdLEDL, PdLEDR, PdBias
-    *Pd_LEDL = (I_LEDL*Vt_out)/n_eff;
-    *Pd_LEDR = (I_LEDR*Vt_out)/n_eff;
-                                                            
-    delay_ms(5*1000); 
-    
-    // using equation 8 calculate RLine and store as constant 
-    *R_line = R_LINE_EQ_Two(Vt_0, Vt_1, Vt_2, *Pd_LEDL, *Pd_LEDR);                      
-    delay_ms(5*1000); // wait 5 seconds                           
-    
-    // using equation 7 calculate external bias power pdbias and store as semi-constant variable
-    *Pd_bias = Pd_bias_one_two(Vt_0, Vt_1, *Pd_LEDL, *R_line);
-
-    // using equation 3 measure truck voltage Vtruck
-    Vt_truck = two_load_V_truck(Vt_2, *Pd_bias, *Pd_LEDL, *Pd_LEDR, *R_line);
-
-    //todo keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-
-    //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-
 }
 
 void Show_Value (unsigned int In)

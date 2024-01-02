@@ -114,27 +114,6 @@ float avg_read_vin_volt(int n)
     return sum_vin/n;
 }
 
-float calculate_truck_voltage(float vin_150v, float R_Line, float Pd_LEDL, float Pd_LEDR, float Pd_bias)
-{
-    // use the vin_150v and variables to determine the trucks voltage given 
-    float vt_truck;
-
-    // determine which equation to use based on what LEDs turned on 
-    if (IN0_LED == 1 && IN1_LED == 1){
-        // both LEDs are on (vt2 equation)
-        vt_truck = two_load_V_truck(vin_150v, Pd_bias, Pd_LEDL, Pd_LEDR, R_Line);
-
-    }else if (IN0_LED == 1 || IN1_LED == 1){
-        // one of the LEDs are on (vt1 equation)
-        vt_truck = one_load_V_truck(vin_150v, Pd_bias, Pd_LEDL, R_Line);
-    }else{
-        // no LEDs are on (vt0 equation)
-        vt_truck = no_load_V_truck(vin_150v, Pd_bias, R_Line);
-    }
-
-    return vt_truck;
-}
-
 float get_SENSE_led()
 {
     // 1A == 4.7V
