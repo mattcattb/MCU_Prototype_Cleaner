@@ -22,18 +22,14 @@
 	#endif
 ;PCODE: $0000000B VOL: 0
 ;PCODE: $0000000C VOL: 0
-
-	.DSEG
-; 0000 0021 float no_load_V_truck(float Vt_0, float Pd_bias, float R_line){
+; 0000 0021 {
 
 	.CSEG
 ;PCODE: $0000000D VOL: 0
 ;PCODE: $0000000E VOL: 0
 ;PCODE: $0000000F VOL: 0
-;	Vt_0 -> Y+8
-;	Pd_bias -> Y+4
-;	R_line -> Y+0
 ;PCODE: $00000010 VOL: 0
+;	Motor -> R17
 ;PCODE: $00000011 VOL: 0
 ;PCODE: $00000012 VOL: 0
 ;PCODE: $00000013 VOL: 0
@@ -48,10 +44,6 @@
 ;PCODE: $0000001C VOL: 0
 ;PCODE: $0000001D VOL: 0
 ;PCODE: $0000001E VOL: 0
-;	Vt_1 -> Y+12
-;	Pd_bias -> Y+8
-;	Pd_LEDL -> Y+4
-;	R_line -> Y+0
 ;PCODE: $0000001F VOL: 0
 ;PCODE: $00000020 VOL: 0
 ;PCODE: $00000021 VOL: 0
@@ -71,11 +63,6 @@
 ;PCODE: $0000002F VOL: 0
 ;PCODE: $00000030 VOL: 0
 ;PCODE: $00000031 VOL: 0
-;	Vt_2 -> Y+16
-;	Pd_bias -> Y+12
-;	Pd_LEDL -> Y+8
-;	Pd_LEDR -> Y+4
-;	R_line -> Y+0
 ;PCODE: $00000032 VOL: 0
 ;PCODE: $00000033 VOL: 0
 ;PCODE: $00000034 VOL: 0
@@ -98,13 +85,6 @@
 ;PCODE: $00000045 VOL: 0
 ;PCODE: $00000046 VOL: 0
 ;PCODE: $00000047 VOL: 0
-;	Vt0 -> Y+24
-;	Vt1 -> Y+20
-;	Pd_LEDL -> Y+16
-;	R_line -> Y+12
-;	val_1 -> Y+8
-;	val_2 -> Y+4
-;	val_3 -> Y+0
 ;PCODE: $00000048 VOL: 0
 ;PCODE: $00000049 VOL: 0
 ;PCODE: $0000004A VOL: 0
@@ -124,6 +104,8 @@
 ;PCODE: $00000058 VOL: 0
 ;PCODE: $00000059 VOL: 0
 ;PCODE: $0000005A VOL: 0
+;	Led1 -> R16
+;	Led2 -> R17
 ;PCODE: $0000005B VOL: 0
 ;PCODE: $0000005C VOL: 0
 ;PCODE: $0000005D VOL: 0
@@ -145,14 +127,6 @@
 ;PCODE: $0000006D VOL: 0
 ;PCODE: $0000006E VOL: 0
 ;PCODE: $0000006F VOL: 0
-;	Vt0 -> Y+28
-;	Vt2 -> Y+24
-;	Pd_LEDL -> Y+20
-;	Pd_LEDR -> Y+16
-;	R_line -> Y+12
-;	val1 -> Y+8
-;	val2 -> Y+4
-;	val3 -> Y+0
 ;PCODE: $00000070 VOL: 0
 ;PCODE: $00000071 VOL: 0
 ;PCODE: $00000072 VOL: 0
@@ -167,6 +141,7 @@
 ;PCODE: $0000007B VOL: 0
 ;PCODE: $0000007C VOL: 0
 ;PCODE: $0000007D VOL: 0
+;	adc_input -> R17
 ;PCODE: $0000007E VOL: 0
 ;PCODE: $0000007F VOL: 0
 ;PCODE: $00000080 VOL: 0
@@ -197,15 +172,6 @@
 ;PCODE: $00000099 VOL: 0
 ;PCODE: $0000009A VOL: 0
 ;PCODE: $0000009B VOL: 0
-;	Vt1 -> Y+32
-;	Vt2 -> Y+28
-;	Pd_LEDL -> Y+24
-;	Pd_LEDR -> Y+20
-;	R_line -> Y+16
-;	val1 -> Y+12
-;	val2 -> Y+8
-;	val3 -> Y+4
-;	denom -> Y+0
 ;PCODE: $0000009C VOL: 0
 ;PCODE: $0000009D VOL: 0
 ;PCODE: $0000009E VOL: 0
@@ -215,6 +181,9 @@
 ;PCODE: $000000A2 VOL: 0
 ;PCODE: $000000A3 VOL: 0
 ;PCODE: $000000A4 VOL: 0
+;	scale_m -> Y+8
+;	scale_b -> Y+4
+;	vin -> Y+0
 ;PCODE: $000000A5 VOL: 0
 ;PCODE: $000000A6 VOL: 0
 ;PCODE: $000000A7 VOL: 0
@@ -249,6 +218,9 @@
 ;PCODE: $000000C4 VOL: 0
 ;PCODE: $000000C5 VOL: 0
 ;PCODE: $000000C6 VOL: 0
+;	n -> R18,R19
+;	sum_vin -> Y+4
+;	i -> R16,R17
 ;PCODE: $000000C7 VOL: 0
 ;PCODE: $000000C8 VOL: 0
 ;PCODE: $000000C9 VOL: 0
@@ -261,10 +233,6 @@
 ;PCODE: $000000D0 VOL: 0
 ;PCODE: $000000D1 VOL: 0
 ;PCODE: $000000D2 VOL: 0
-;	vt_0 -> Y+12
-;	vt_1 -> Y+8
-;	Pd_LEDL -> Y+4
-;	Pd_bias -> Y+0
 ;PCODE: $000000D3 VOL: 0
 ;PCODE: $000000D4 VOL: 0
 ;PCODE: $000000D5 VOL: 0
@@ -293,16 +261,11 @@
 ;PCODE: $000000EC VOL: 0
 ;PCODE: $000000ED VOL: 0
 ;PCODE: $000000EE VOL: 0
-;	vt_0 -> Y+32
-;	vt_1 -> Y+28
-;	vt_2 -> Y+24
-;	Pd_LEDL -> Y+20
-;	Pd_LEDR -> Y+16
-;	val1 -> Y+12
-;	val2 -> Y+8
-;	val3 -> Y+4
-;	rline -> Y+0
 ;PCODE: $000000EF VOL: 0
+;	max_current -> Y+12
+;	max_voltage -> Y+8
+;	current -> Y+4
+;	sense_voltage -> Y+0
 ;PCODE: $000000F0 VOL: 0
 ;PCODE: $000000F1 VOL: 0
 ;PCODE: $000000F2 VOL: 0
@@ -331,98 +294,153 @@
 ;PCODE: $00000109 VOL: 0
 ;PCODE: $0000010A VOL: 0
 ;PCODE: $0000010B VOL: 0
+;void motor_loop(float In150V_Val);
+;void Show_Value (unsigned int In);
+;void steady_voltage();
+;void check_error_state();
+;void TEST_show_value(unsigned int In);
+
+	.DSEG
+;interrupt [17] void timer0_ovf_isr(void)
+; 0000 0047 {
+
+	.CSEG
 ;PCODE: $0000010C VOL: 0
 ;PCODE: $0000010D VOL: 0
+; 0000 0048 float n = 300;
+; 0000 0049 unsigned char dot_mask = 0b10000000;
+; 0000 004A // here display 1 of the digits and add to the sum to calculate the average over 300 readings
+; 0000 004B Seg1 = 1;
 ;PCODE: $0000010E VOL: 0
 ;PCODE: $0000010F VOL: 0
 ;PCODE: $00000110 VOL: 0
 ;PCODE: $00000111 VOL: 0
 ;PCODE: $00000112 VOL: 0
-; 0000 0022 {
 ;PCODE: $00000113 VOL: 0
 ;PCODE: $00000114 VOL: 0
 ;PCODE: $00000115 VOL: 0
 ;PCODE: $00000116 VOL: 0
-;	Motor -> R17
 ;PCODE: $00000117 VOL: 0
+;	n -> Y+1
+;	dot_mask -> R17
 ;PCODE: $00000118 VOL: 0
 ;PCODE: $00000119 VOL: 0
 ;PCODE: $0000011A VOL: 0
 ;PCODE: $0000011B VOL: 0
+; 0000 004C Seg2 = 1;
 ;PCODE: $0000011C VOL: 0
 ;PCODE: $0000011D VOL: 0
+; 0000 004D Seg3 = 1;
 ;PCODE: $0000011E VOL: 0
 ;PCODE: $0000011F VOL: 0
+; 0000 004E 
+; 0000 004F if(DISPLAY_Counter == 0)
 ;PCODE: $00000120 VOL: 0
 ;PCODE: $00000121 VOL: 0
+; 0000 0050 {
+; 0000 0051 SegData = SegmentData[DISPLAY[1]];
 ;PCODE: $00000122 VOL: 0
 ;PCODE: $00000123 VOL: 0
 ;PCODE: $00000124 VOL: 0
 ;PCODE: $00000125 VOL: 0
 ;PCODE: $00000126 VOL: 0
 ;PCODE: $00000127 VOL: 0
+; 0000 0052 
+; 0000 0053 // mask data to turn on dot if error code suggests it
+; 0000 0054 if (((error_state >> 2) & 0b001) == 0b001){
 ;PCODE: $00000128 VOL: 0
 ;PCODE: $00000129 VOL: 0
 ;PCODE: $0000012A VOL: 0
 ;PCODE: $0000012B VOL: 0
 ;PCODE: $0000012C VOL: 0
 ;PCODE: $0000012D VOL: 0
+; 0000 0055 // TEST_show_value(50);
+; 0000 0056 SegData = SegData | dot_mask;
 ;PCODE: $0000012E VOL: 0
 ;PCODE: $0000012F VOL: 0
 ;PCODE: $00000130 VOL: 0
+; 0000 0057 }
+; 0000 0058 
+; 0000 0059 DISPLAY_Counter++;
 ;PCODE: $00000131 VOL: 0
 ;PCODE: $00000132 VOL: 0
+; 0000 005A Seg3 = 0;
 ;PCODE: $00000133 VOL: 0
 ;PCODE: $00000134 VOL: 0
+; 0000 005B }
+; 0000 005C else if( DISPLAY_Counter == 1)
 ;PCODE: $00000135 VOL: 0
 ;PCODE: $00000136 VOL: 0
 ;PCODE: $00000137 VOL: 0
 ;PCODE: $00000138 VOL: 0
 ;PCODE: $00000139 VOL: 0
+; 0000 005D {
+; 0000 005E SegData = SegmentData[DISPLAY[2]];
 ;PCODE: $0000013A VOL: 0
 ;PCODE: $0000013B VOL: 0
 ;PCODE: $0000013C VOL: 0
 ;PCODE: $0000013D VOL: 0
 ;PCODE: $0000013E VOL: 0
-;	Led1 -> R16
-;	Led2 -> R17
 ;PCODE: $0000013F VOL: 0
+; 0000 005F 
+; 0000 0060 if (((error_state >> 1) & 0b001) == 0b001){
 ;PCODE: $00000140 VOL: 0
 ;PCODE: $00000141 VOL: 0
 ;PCODE: $00000142 VOL: 0
 ;PCODE: $00000143 VOL: 0
 ;PCODE: $00000144 VOL: 0
 ;PCODE: $00000145 VOL: 0
+; 0000 0061 SegData = SegData | dot_mask;
 ;PCODE: $00000146 VOL: 0
 ;PCODE: $00000147 VOL: 0
 ;PCODE: $00000148 VOL: 0
+; 0000 0062 }
+; 0000 0063 
+; 0000 0064 DISPLAY_Counter++;
 ;PCODE: $00000149 VOL: 0
 ;PCODE: $0000014A VOL: 0
+; 0000 0065 Seg2 = 0;
 ;PCODE: $0000014B VOL: 0
 ;PCODE: $0000014C VOL: 0
+; 0000 0066 }
+; 0000 0067 else
 ;PCODE: $0000014D VOL: 0
 ;PCODE: $0000014E VOL: 0
+; 0000 0068 {
+; 0000 0069 SegData = SegmentData[DISPLAY[3]];
 ;PCODE: $0000014F VOL: 0
 ;PCODE: $00000150 VOL: 0
 ;PCODE: $00000151 VOL: 0
 ;PCODE: $00000152 VOL: 0
 ;PCODE: $00000153 VOL: 0
 ;PCODE: $00000154 VOL: 0
+; 0000 006A 
+; 0000 006B 
+; 0000 006C if (((error_state >> 0) & 0b001) == 0b001){
 ;PCODE: $00000155 VOL: 0
 ;PCODE: $00000156 VOL: 0
 ;PCODE: $00000157 VOL: 0
 ;PCODE: $00000158 VOL: 0
 ;PCODE: $00000159 VOL: 0
+; 0000 006D SegData = SegData | dot_mask;
 ;PCODE: $0000015A VOL: 0
 ;PCODE: $0000015B VOL: 0
 ;PCODE: $0000015C VOL: 0
+; 0000 006E }
+; 0000 006F 
+; 0000 0070 DISPLAY_Counter = 0;
 ;PCODE: $0000015D VOL: 0
 ;PCODE: $0000015E VOL: 0
+; 0000 0071 Seg1 = 0;
 ;PCODE: $0000015F VOL: 0
 ;PCODE: $00000160 VOL: 0
+; 0000 0072 }
 ;PCODE: $00000161 VOL: 0
-;	adc_input -> R17
 ;PCODE: $00000162 VOL: 0
+; 0000 0073 //------------------------------
+; 0000 0074 // AveInPout150V += read_vin_volt();
+; 0000 0075 // this should properly scale between 100-200 volts
+; 0000 0076 AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
 ;PCODE: $00000163 VOL: 0
 ;PCODE: $00000164 VOL: 0
 ;PCODE: $00000165 VOL: 0
@@ -438,6 +456,9 @@
 ;PCODE: $0000016F VOL: 0
 ;PCODE: $00000170 VOL: 0
 ;PCODE: $00000171 VOL: 0
+; 0000 0077 
+; 0000 0078 
+; 0000 0079 if(FreeCount++ >= n)
 ;PCODE: $00000172 VOL: 0
 ;PCODE: $00000173 VOL: 0
 ;PCODE: $00000174 VOL: 0
@@ -447,27 +468,38 @@
 ;PCODE: $00000178 VOL: 0
 ;PCODE: $00000179 VOL: 0
 ;PCODE: $0000017A VOL: 0
+; 0000 007A {
+; 0000 007B // calculate average once n readings have been reached
+; 0000 007C FreeCount = 0;
 ;PCODE: $0000017B VOL: 0
+; 0000 007D InPout150V = (AveInPout150V/n);
 ;PCODE: $0000017C VOL: 0
 ;PCODE: $0000017D VOL: 0
 ;PCODE: $0000017E VOL: 0
 ;PCODE: $0000017F VOL: 0
 ;PCODE: $00000180 VOL: 0
 ;PCODE: $00000181 VOL: 0
+; 0000 007E AveInPout150V=0;
 ;PCODE: $00000182 VOL: 0
 ;PCODE: $00000183 VOL: 0
+; 0000 007F }
+; 0000 0080 
+; 0000 0081 //------------------------------
+; 0000 0082 }
 ;PCODE: $00000184 VOL: 0
 ;PCODE: $00000185 VOL: 0
 ;PCODE: $00000186 VOL: 0
 ;PCODE: $00000187 VOL: 0
 ;PCODE: $00000188 VOL: 0
-;	scale_m -> Y+8
-;	scale_b -> Y+4
-;	vin -> Y+0
 ;PCODE: $00000189 VOL: 0
 ;PCODE: $0000018A VOL: 0
+;void main(void)
+; 0000 0085 {
 ;PCODE: $0000018B VOL: 0
+; 0000 0086 float temp_val;
+; 0000 0087 #include <Init.c>
 ;PCODE: $0000018C VOL: 0
+;	temp_val -> Y+0
 ;PCODE: $0000018D VOL: 0
 ;PCODE: $0000018E VOL: 0
 ;PCODE: $0000018F VOL: 0
@@ -498,9 +530,6 @@
 ;PCODE: $000001A8 VOL: 0
 ;PCODE: $000001A9 VOL: 0
 ;PCODE: $000001AA VOL: 0
-;	n -> R18,R19
-;	sum_vin -> Y+4
-;	i -> R16,R17
 ;PCODE: $000001AB VOL: 0
 ;PCODE: $000001AC VOL: 0
 ;PCODE: $000001AD VOL: 0
@@ -527,12 +556,6 @@
 ;PCODE: $000001C2 VOL: 0
 ;PCODE: $000001C3 VOL: 0
 ;PCODE: $000001C4 VOL: 0
-;	vin_150v -> Y+20
-;	R_Line -> Y+16
-;	Pd_LEDL -> Y+12
-;	Pd_LEDR -> Y+8
-;	Pd_bias -> Y+4
-;	vt_truck -> Y+0
 ;PCODE: $000001C5 VOL: 0
 ;PCODE: $000001C6 VOL: 0
 ;PCODE: $000001C7 VOL: 0
@@ -564,28 +587,67 @@
 ;PCODE: $000001E1 VOL: 0
 ;PCODE: $000001E2 VOL: 0
 ;PCODE: $000001E3 VOL: 0
+; 0000 0088 
+; 0000 0089 // delay_ms(5*1000);
+; 0000 008A 
+; 0000 008B // turn both LEDs on
+; 0000 008C control_LED(ON, ON);
 ;PCODE: $000001E4 VOL: 0
 ;PCODE: $000001E5 VOL: 0
 ;PCODE: $000001E6 VOL: 0
 ;PCODE: $000001E7 VOL: 0
+; 0000 008D 
+; 0000 008E // wait for first voltage to be between 140 and 160
+; 0000 008F // steady_voltage();
+; 0000 0090 
+; 0000 0091 // set both drivers low and enable on
+; 0000 0092 M_D_R = 0;
 ;PCODE: $000001E8 VOL: 0
 ;PCODE: $000001E9 VOL: 0
+; 0000 0093 M_D_L = 0;
 ;PCODE: $000001EA VOL: 0
 ;PCODE: $000001EB VOL: 0
+; 0000 0094 M_EN = 0;
 ;PCODE: $000001EC VOL: 0
 ;PCODE: $000001ED VOL: 0
+; 0000 0095 
+; 0000 0096 TEST_show_value(error_state);
 ;PCODE: $000001EE VOL: 0
 ;PCODE: $000001EF VOL: 0
 ;PCODE: $000001F0 VOL: 0
+; 0000 0097 
+; 0000 0098 while (1)
 ;PCODE: $000001F1 VOL: 0
+; 0000 0099 {
+; 0000 009A 
+; 0000 009B // check_error_state();
+; 0000 009C 
+; 0000 009D //! make this more accurate!
+; 0000 009E // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
+; 0000 009F 
+; 0000 00A0 // set value to be shown on 7-seg display
+; 0000 00A1 //! SWITCH TO SHOW VOLTAGE VALUE !!!
+; 0000 00A2 
+; 0000 00A3 // control motor based on reading
+; 0000 00A4 // motor_loop(temp_val);
+; 0000 00A5 
+; 0000 00A6 //! add droop compensation here!
+; 0000 00A7 
+; 0000 00A8 }
 ;PCODE: $000001F2 VOL: 0
 ;PCODE: $000001F3 VOL: 0
+; 0000 00A9 }
 ;PCODE: $000001F4 VOL: 0
 ;PCODE: $000001F5 VOL: 0
 ;PCODE: $000001F6 VOL: 0
 ;PCODE: $000001F7 VOL: 0
+;void check_error_state(){
+; 0000 00AC void check_error_state(){
 ;PCODE: $000001F8 VOL: 0
 ;PCODE: $000001F9 VOL: 0
+; 0000 00AD // make changes to error state
+; 0000 00AE 
+; 0000 00AF if (InPout150V < 132 && (get_motor_state() == Down))
 ;PCODE: $000001FA VOL: 0
 ;PCODE: $000001FB VOL: 0
 ;PCODE: $000001FC VOL: 0
@@ -596,21 +658,31 @@
 ;PCODE: $00000201 VOL: 0
 ;PCODE: $00000202 VOL: 0
 ;PCODE: $00000203 VOL: 0
+; 0000 00B0 {
+; 0000 00B1 // voltage below 132V, and lift lowering
+; 0000 00B2 error_state = 2;
 ;PCODE: $00000204 VOL: 0
 ;PCODE: $00000205 VOL: 0
+; 0000 00B3 }else
 ;PCODE: $00000206 VOL: 0
 ;PCODE: $00000207 VOL: 0
+; 0000 00B4 {
+; 0000 00B5 // no error state
+; 0000 00B6 error_state = 0;
 ;PCODE: $00000208 VOL: 0
+; 0000 00B7 }
 ;PCODE: $00000209 VOL: 0
+; 0000 00B8 }
 ;PCODE: $0000020A VOL: 0
 ;PCODE: $0000020B VOL: 0
+;void steady_voltage()
+; 0000 00BB {
 ;PCODE: $0000020C VOL: 0
 ;PCODE: $0000020D VOL: 0
+; 0000 00BC // wait for voltage to steady out to being between 160 and 140
+; 0000 00BD 
+; 0000 00BE while(InPout150V>160 || InPout150V < 140){
 ;PCODE: $0000020E VOL: 0
-;	max_current -> Y+12
-;	max_voltage -> Y+8
-;	current -> Y+4
-;	sense_voltage -> Y+0
 ;PCODE: $0000020F VOL: 0
 ;PCODE: $00000210 VOL: 0
 ;PCODE: $00000211 VOL: 0
@@ -619,18 +691,29 @@
 ;PCODE: $00000214 VOL: 0
 ;PCODE: $00000215 VOL: 0
 ;PCODE: $00000216 VOL: 0
+; 0000 00BF // keep waiting while greater then 160 or less then 140
+; 0000 00C0 delay_ms(2);
 ;PCODE: $00000217 VOL: 0
 ;PCODE: $00000218 VOL: 0
 ;PCODE: $00000219 VOL: 0
+; 0000 00C1 }
 ;PCODE: $0000021A VOL: 0
 ;PCODE: $0000021B VOL: 0
+; 0000 00C2 // finally, should be between 160 and 140 so return
+; 0000 00C3 return;
 ;PCODE: $0000021C VOL: 0
+; 0000 00C4 }
 ;PCODE: $0000021D VOL: 0
+;void TEST_show_value(unsigned int In)
+; 0000 00C7 {
 ;PCODE: $0000021E VOL: 0
 ;PCODE: $0000021F VOL: 0
+; 0000 00C8 // display integer on 3 digit 7-segment display
+; 0000 00C9 DISPLAY[1] = ((In / 100) % 10);
 ;PCODE: $00000220 VOL: 0
 ;PCODE: $00000221 VOL: 0
 ;PCODE: $00000222 VOL: 0
+;	In -> R16,R17
 ;PCODE: $00000223 VOL: 0
 ;PCODE: $00000224 VOL: 0
 ;PCODE: $00000225 VOL: 0
@@ -639,111 +722,97 @@
 ;PCODE: $00000228 VOL: 0
 ;PCODE: $00000229 VOL: 0
 ;PCODE: $0000022A VOL: 0
-;void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias);
-;void motor_loop(float In150V_Val);
-;void Show_Value (unsigned int In);
-;void steady_voltage();
-
-	.DSEG
-;interrupt [17] void timer0_ovf_isr(void)
-; 0000 004B {
-
-	.CSEG
+; 0000 00CA DISPLAY[2] = ((In / 10) % 10);
 ;PCODE: $0000022B VOL: 0
 ;PCODE: $0000022C VOL: 0
-; 0000 004C float n = 300;
-; 0000 004D unsigned cha r dot_mask = 0b10000000;
 ;PCODE: $0000022D VOL: 0
 ;PCODE: $0000022E VOL: 0
 ;PCODE: $0000022F VOL: 0
 ;PCODE: $00000230 VOL: 0
 ;PCODE: $00000231 VOL: 0
 ;PCODE: $00000232 VOL: 0
+; 0000 00CB DISPLAY[3] = ((In / 1) % 10);
 ;PCODE: $00000233 VOL: 0
 ;PCODE: $00000234 VOL: 0
 ;PCODE: $00000235 VOL: 0
 ;PCODE: $00000236 VOL: 0
 ;PCODE: $00000237 VOL: 0
-;	n -> Y+2
-;	cha -> R16,R17
+; 0000 00CC 
+; 0000 00CD }
 ;PCODE: $00000238 VOL: 0
-; 0000 004E // here display 1 of the digits and add to the sum to calculate the average over 300 readings
-; 0000 004F Seg1 = 1;
 ;PCODE: $00000239 VOL: 0
 ;PCODE: $0000023A VOL: 0
-; 0000 0050 Seg2 = 1;
+;void Show_Value (unsigned int In)
+; 0000 00D0 {
 ;PCODE: $0000023B VOL: 0
 ;PCODE: $0000023C VOL: 0
-; 0000 0051 Seg3 = 1;
+; 0000 00D1 // display integer on 3 digit 7-segment display
+; 0000 00D2 if(InPout150V <= 100)
 ;PCODE: $0000023D VOL: 0
 ;PCODE: $0000023E VOL: 0
-; 0000 0052 
-; 0000 0053 if(DISPLAY_Counter == 0)
 ;PCODE: $0000023F VOL: 0
+;	In -> R16,R17
 ;PCODE: $00000240 VOL: 0
-; 0000 0054 {
-; 0000 0055 SegData = SegmentData[DISPLAY[1]];
 ;PCODE: $00000241 VOL: 0
 ;PCODE: $00000242 VOL: 0
+; 0000 00D3 {
+; 0000 00D4 DISPLAY[1] = 19;//Err
 ;PCODE: $00000243 VOL: 0
 ;PCODE: $00000244 VOL: 0
 ;PCODE: $00000245 VOL: 0
+; 0000 00D5 DISPLAY[2] = 20;
 ;PCODE: $00000246 VOL: 0
-; 0000 0056 // mask data to turn on dot
-; 0000 0057 SegData = SegData | dot_mask;
 ;PCODE: $00000247 VOL: 0
 ;PCODE: $00000248 VOL: 0
+; 0000 00D6 DISPLAY[3] = 20;
 ;PCODE: $00000249 VOL: 0
 ;PCODE: $0000024A VOL: 0
-; 0000 0058 DISPLAY_Counter++;
 ;PCODE: $0000024B VOL: 0
-; 0000 0059 Seg3 = 0;
+; 0000 00D7 }
+; 0000 00D8 else
 ;PCODE: $0000024C VOL: 0
 ;PCODE: $0000024D VOL: 0
-; 0000 005A }
-; 0000 005B else if( DISPLAY_Counter == 1)
+; 0000 00D9 {
+; 0000 00DA DISPLAY[1] = ((In / 100) % 10);
 ;PCODE: $0000024E VOL: 0
 ;PCODE: $0000024F VOL: 0
 ;PCODE: $00000250 VOL: 0
 ;PCODE: $00000251 VOL: 0
 ;PCODE: $00000252 VOL: 0
-; 0000 005C {
-; 0000 005D SegData = SegmentData[DISPLAY[2]];
 ;PCODE: $00000253 VOL: 0
 ;PCODE: $00000254 VOL: 0
 ;PCODE: $00000255 VOL: 0
+; 0000 00DB DISPLAY[2] = ((In / 10) % 10);
 ;PCODE: $00000256 VOL: 0
 ;PCODE: $00000257 VOL: 0
 ;PCODE: $00000258 VOL: 0
-; 0000 005E DISPLAY_Counter++;
 ;PCODE: $00000259 VOL: 0
-; 0000 005F Seg2 = 0;
 ;PCODE: $0000025A VOL: 0
 ;PCODE: $0000025B VOL: 0
-; 0000 0060 }
-; 0000 0061 else
 ;PCODE: $0000025C VOL: 0
 ;PCODE: $0000025D VOL: 0
-; 0000 0062 {
-; 0000 0063 SegData = SegmentData[DISPLAY[3]];
+; 0000 00DC DISPLAY[3] = ((In / 1) % 10);
 ;PCODE: $0000025E VOL: 0
 ;PCODE: $0000025F VOL: 0
 ;PCODE: $00000260 VOL: 0
 ;PCODE: $00000261 VOL: 0
 ;PCODE: $00000262 VOL: 0
+; 0000 00DD }
 ;PCODE: $00000263 VOL: 0
-; 0000 0064 DISPLAY_Counter = 0;
+; 0000 00DE }
 ;PCODE: $00000264 VOL: 0
-; 0000 0065 Seg1 = 0;
 ;PCODE: $00000265 VOL: 0
 ;PCODE: $00000266 VOL: 0
-; 0000 0066 }
+;void motor_loop(float In150V_Val)
+; 0000 00E1 {
 ;PCODE: $00000267 VOL: 0
 ;PCODE: $00000268 VOL: 0
-; 0000 0067 //------------------------------
-; 0000 0068 // AveInPout150V += read_vin_volt();
-; 0000 0069 // this should properly scale between 100-200 volts
-; 0000 006A AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
+; 0000 00E2 //! make this have latch functionality
+; 0000 00E3 
+; 0000 00E4 float latch_val = 150;
+; 0000 00E5 
+; 0000 00E6 // if voltage > 160, go up
+; 0000 00E7 if(In150V_Val > 160)
 ;PCODE: $00000269 VOL: 0
 ;PCODE: $0000026A VOL: 0
 ;PCODE: $0000026B VOL: 0
@@ -754,72 +823,63 @@
 ;PCODE: $00000270 VOL: 0
 ;PCODE: $00000271 VOL: 0
 ;PCODE: $00000272 VOL: 0
+;	In150V_Val -> Y+4
+;	latch_val -> Y+0
 ;PCODE: $00000273 VOL: 0
 ;PCODE: $00000274 VOL: 0
 ;PCODE: $00000275 VOL: 0
 ;PCODE: $00000276 VOL: 0
+; 0000 00E8 {
+; 0000 00E9 // lift UP
+; 0000 00EA Motor_R_L_Off(Right);// Right Left OFF
 ;PCODE: $00000277 VOL: 0
-; 0000 006B 
-; 0000 006C 
-; 0000 006D if(FreeCount++ >= n)
 ;PCODE: $00000278 VOL: 0
+; 0000 00EB 
+; 0000 00EC return;
 ;PCODE: $00000279 VOL: 0
 ;PCODE: $0000027A VOL: 0
+; 0000 00ED }
+; 0000 00EE 
+; 0000 00EF // if voltage between 140,105 go down
+; 0000 00F0 if((In150V_Val < 140) && (In150V_Val > 105))
 ;PCODE: $0000027B VOL: 0
 ;PCODE: $0000027C VOL: 0
 ;PCODE: $0000027D VOL: 0
 ;PCODE: $0000027E VOL: 0
 ;PCODE: $0000027F VOL: 0
 ;PCODE: $00000280 VOL: 0
-; 0000 006E {
-; 0000 006F FreeCount = 0;
 ;PCODE: $00000281 VOL: 0
-; 0000 0070 InPout150V = (AveInPout150V/n);
 ;PCODE: $00000282 VOL: 0
 ;PCODE: $00000283 VOL: 0
 ;PCODE: $00000284 VOL: 0
 ;PCODE: $00000285 VOL: 0
 ;PCODE: $00000286 VOL: 0
 ;PCODE: $00000287 VOL: 0
-; 0000 0071 AveInPout150V=0;
+; 0000 00F1 {
+; 0000 00F2 // lift DOWN
+; 0000 00F3 Motor_R_L_Off(Left);// Right Left OFF
 ;PCODE: $00000288 VOL: 0
 ;PCODE: $00000289 VOL: 0
-; 0000 0072 //            if(FreeCount2 == 0){LEDS_On_Off(OFF, OFF); FreeCount2 = 2; }
-; 0000 0073 //            else {LEDS_On_Off(ON, ON); FreeCount2 = 0; }
-; 0000 0074 }
-; 0000 0075 
-; 0000 0076 //------------------------------
-; 0000 0077 }
+; 0000 00F4 
+; 0000 00F5 if (In150V_Val < 132){
 ;PCODE: $0000028A VOL: 0
 ;PCODE: $0000028B VOL: 0
 ;PCODE: $0000028C VOL: 0
 ;PCODE: $0000028D VOL: 0
+; 0000 00F6 // turn off one headlamp until lift stops moving
+; 0000 00F7 control_LED(ON, OFF);
 ;PCODE: $0000028E VOL: 0
 ;PCODE: $0000028F VOL: 0
 ;PCODE: $00000290 VOL: 0
 ;PCODE: $00000291 VOL: 0
+; 0000 00F8 }
+; 0000 00F9 return;
 ;PCODE: $00000292 VOL: 0
-;void main(void)
-; 0000 007A {
 ;PCODE: $00000293 VOL: 0
-; 0000 007B // power variables
-; 0000 007C float Pd_bias;
-; 0000 007D float Pd_LEDL;
-; 0000 007E float Pd_LEDR;
-; 0000 007F 
-; 0000 0080 // voltage of truck
-; 0000 0081 float Vt_truck;
-; 0000 0082 
-; 0000 0083 // resistance of line
-; 0000 0084 float R_Line_val;
-; 0000 0085 
-; 0000 0086 #include <Init.c>
 ;PCODE: $00000294 VOL: 0
-;	Pd_bias -> Y+16
-;	Pd_LEDL -> Y+12
-;	Pd_LEDR -> Y+8
-;	Vt_truck -> Y+4
-;	R_Line_val -> Y+0
+; 0000 00FA }
+; 0000 00FB 
+; 0000 00FC if (get_motor_state() == Up && (In150V_Val < latch_val)){
 ;PCODE: $00000295 VOL: 0
 ;PCODE: $00000296 VOL: 0
 ;PCODE: $00000297 VOL: 0
@@ -832,8 +892,15 @@
 ;PCODE: $0000029E VOL: 0
 ;PCODE: $0000029F VOL: 0
 ;PCODE: $000002A0 VOL: 0
+; 0000 00FD // motor is going up and latch was bypassed!
+; 0000 00FE 
+; 0000 00FF // stop motor
+; 0000 0100 Motor_R_L_Off(OFF);
 ;PCODE: $000002A1 VOL: 0
 ;PCODE: $000002A2 VOL: 0
+; 0000 0101 }
+; 0000 0102 
+; 0000 0103 if (get_motor_state() == Down && (In150V_Val > latch_val)){
 ;PCODE: $000002A3 VOL: 0
 ;PCODE: $000002A4 VOL: 0
 ;PCODE: $000002A5 VOL: 0
@@ -846,580 +913,17 @@
 ;PCODE: $000002AC VOL: 0
 ;PCODE: $000002AD VOL: 0
 ;PCODE: $000002AE VOL: 0
+; 0000 0104 // motor is going down and latch was bypassed!
+; 0000 0105 
+; 0000 0106 // stop motor
+; 0000 0107 Motor_R_L_Off(OFF);
 ;PCODE: $000002AF VOL: 0
 ;PCODE: $000002B0 VOL: 0
+; 0000 0108 }
+; 0000 0109 
+; 0000 010A 
+; 0000 010B }
 ;PCODE: $000002B1 VOL: 0
 ;PCODE: $000002B2 VOL: 0
 ;PCODE: $000002B3 VOL: 0
 ;PCODE: $000002B4 VOL: 0
-;PCODE: $000002B5 VOL: 0
-;PCODE: $000002B6 VOL: 0
-;PCODE: $000002B7 VOL: 0
-;PCODE: $000002B8 VOL: 0
-;PCODE: $000002B9 VOL: 0
-;PCODE: $000002BA VOL: 0
-;PCODE: $000002BB VOL: 0
-;PCODE: $000002BC VOL: 0
-;PCODE: $000002BD VOL: 0
-;PCODE: $000002BE VOL: 0
-;PCODE: $000002BF VOL: 0
-;PCODE: $000002C0 VOL: 0
-;PCODE: $000002C1 VOL: 0
-;PCODE: $000002C2 VOL: 0
-;PCODE: $000002C3 VOL: 0
-;PCODE: $000002C4 VOL: 0
-;PCODE: $000002C5 VOL: 0
-;PCODE: $000002C6 VOL: 0
-;PCODE: $000002C7 VOL: 0
-;PCODE: $000002C8 VOL: 0
-;PCODE: $000002C9 VOL: 0
-;PCODE: $000002CA VOL: 0
-;PCODE: $000002CB VOL: 0
-;PCODE: $000002CC VOL: 0
-;PCODE: $000002CD VOL: 0
-;PCODE: $000002CE VOL: 0
-;PCODE: $000002CF VOL: 0
-;PCODE: $000002D0 VOL: 0
-;PCODE: $000002D1 VOL: 0
-;PCODE: $000002D2 VOL: 0
-;PCODE: $000002D3 VOL: 0
-;PCODE: $000002D4 VOL: 0
-;PCODE: $000002D5 VOL: 0
-;PCODE: $000002D6 VOL: 0
-;PCODE: $000002D7 VOL: 0
-;PCODE: $000002D8 VOL: 0
-;PCODE: $000002D9 VOL: 0
-;PCODE: $000002DA VOL: 0
-;PCODE: $000002DB VOL: 0
-;PCODE: $000002DC VOL: 0
-;PCODE: $000002DD VOL: 0
-;PCODE: $000002DE VOL: 0
-;PCODE: $000002DF VOL: 0
-;PCODE: $000002E0 VOL: 0
-;PCODE: $000002E1 VOL: 0
-;PCODE: $000002E2 VOL: 0
-;PCODE: $000002E3 VOL: 0
-;PCODE: $000002E4 VOL: 0
-;PCODE: $000002E5 VOL: 0
-;PCODE: $000002E6 VOL: 0
-;PCODE: $000002E7 VOL: 0
-;PCODE: $000002E8 VOL: 0
-;PCODE: $000002E9 VOL: 0
-;PCODE: $000002EA VOL: 0
-;PCODE: $000002EB VOL: 0
-; 0000 0087 
-; 0000 0088 delay_ms(5*1000);
-;PCODE: $000002EC VOL: 0
-;PCODE: $000002ED VOL: 0
-; 0000 0089 
-; 0000 008A control_LED(ON, ON);
-;PCODE: $000002EE VOL: 0
-;PCODE: $000002EF VOL: 0
-;PCODE: $000002F0 VOL: 0
-;PCODE: $000002F1 VOL: 0
-; 0000 008B 
-; 0000 008C // configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
-; 0000 008D // voltage_calc_phase(&R_Line_val, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
-; 0000 008E 
-; 0000 008F control_LED(ON, ON);
-;PCODE: $000002F2 VOL: 0
-;PCODE: $000002F3 VOL: 0
-;PCODE: $000002F4 VOL: 0
-;PCODE: $000002F5 VOL: 0
-; 0000 0090 
-; 0000 0091 // wait for first voltage to be between 140 and 160
-; 0000 0092 steady_voltage();
-;PCODE: $000002F6 VOL: 0
-; 0000 0093 
-; 0000 0094 motor_setup();
-; 0000 0095 
-; 0000 0096 while (1)
-;PCODE: $000002F7 VOL: 0
-;PCODE: $000002F8 VOL: 0
-; 0000 0097 {
-; 0000 0098 check_error_state();
-; 0000 0099 
-; 0000 009A // Vt_truck = calculate_truck_voltage(InPout150V, R_Line_val, Pd_LEDL, Pd_LEDR, Pd_bias);
-; 0000 009B float temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
-;PCODE: $000002F9 VOL: 0
-; 0000 009C 
-; 0000 009D // set value to be shown on 7-seg display
-; 0000 009E Show_Value(temp_val);
-;PCODE: $000002FA VOL: 0
-;	Pd_bias -> Y+19
-;	Pd_LEDL -> Y+15
-;	Pd_LEDR -> Y+11
-;	Vt_truck -> Y+7
-;	R_Line_val -> Y+3
-;	temp_val -> Y+0
-;PCODE: $000002FB VOL: 0
-;PCODE: $000002FC VOL: 0
-;PCODE: $000002FD VOL: 0
-;PCODE: $000002FE VOL: 0
-;PCODE: $000002FF VOL: 0
-;PCODE: $00000300 VOL: 0
-;PCODE: $00000301 VOL: 0
-;PCODE: $00000302 VOL: 0
-;PCODE: $00000303 VOL: 0
-;PCODE: $00000304 VOL: 0
-;PCODE: $00000305 VOL: 0
-;PCODE: $00000306 VOL: 0
-;PCODE: $00000307 VOL: 0
-;PCODE: $00000308 VOL: 0
-;PCODE: $00000309 VOL: 0
-;PCODE: $0000030A VOL: 0
-; 0000 009F 
-; 0000 00A0 // control motor based on reading
-; 0000 00A1 motor_loop(temp_val);
-;PCODE: $0000030B VOL: 0
-;PCODE: $0000030C VOL: 0
-; 0000 00A2 
-; 0000 00A3 }
-;PCODE: $0000030D VOL: 0
-;PCODE: $0000030E VOL: 0
-;PCODE: $0000030F VOL: 0
-; 0000 00A4 }
-;PCODE: $00000310 VOL: 0
-;PCODE: $00000311 VOL: 0
-;PCODE: $00000312 VOL: 0
-;PCODE: $00000313 VOL: 0
-;void motor_setup(){
-; 0000 00A6 void motor_setup(){
-;PCODE: $00000314 VOL: 0
-;PCODE: $00000315 VOL: 0
-; 0000 00A7 
-; 0000 00A8 // set both drivers low and enable on
-; 0000 00A9 M_D_R = 0;
-;PCODE: $00000316 VOL: 0
-;PCODE: $00000317 VOL: 0
-; 0000 00AA M_D_L = 0;
-;PCODE: $00000318 VOL: 0
-;PCODE: $00000319 VOL: 0
-; 0000 00AB M_EN = 1;
-;PCODE: $0000031A VOL: 0
-;PCODE: $0000031B VOL: 0
-; 0000 00AC 
-; 0000 00AD // get Vlm.0 by measuring pin 19
-; 0000 00AE //! need to setup ADC 6 for this
-; 0000 00AF Vlm_0 = read_adc(M_R_Sense);
-;PCODE: $0000031C VOL: 0
-;PCODE: $0000031D VOL: 0
-;PCODE: $0000031E VOL: 0
-;PCODE: $0000031F VOL: 0
-;PCODE: $00000320 VOL: 0
-;PCODE: $00000321 VOL: 0
-;PCODE: $00000322 VOL: 0
-;PCODE: $00000323 VOL: 0
-; 0000 00B0 
-; 0000 00B1 
-; 0000 00B2 // measure motor current with (Vread-Vlm.0)/6.5 amps
-; 0000 00B3 
-; 0000 00B4 
-; 0000 00B5 
-; 0000 00B6 }
-;PCODE: $00000324 VOL: 0
-;PCODE: $00000325 VOL: 0
-;PCODE: $00000326 VOL: 0
-;float get_motor_current(){
-; 0000 00B8 float get_motor_current(){
-;PCODE: $00000327 VOL: 0
-;PCODE: $00000328 VOL: 0
-; 0000 00B9 // get motor current by measuring pin 19
-; 0000 00BA float Vread = read_adc(M_R_Sense);
-;PCODE: $00000329 VOL: 0
-;	Vread -> Y+0
-;PCODE: $0000032A VOL: 0
-;PCODE: $0000032B VOL: 0
-;PCODE: $0000032C VOL: 0
-;PCODE: $0000032D VOL: 0
-;PCODE: $0000032E VOL: 0
-; 0000 00BB float I_motor = (Vread - Vlm_0)/6.5;
-;PCODE: $0000032F VOL: 0
-; 0000 00BC return I_motor;
-;PCODE: $00000330 VOL: 0
-;	Vread -> Y+3
-;	I_motor -> Y+0
-;PCODE: $00000331 VOL: 0
-;PCODE: $00000332 VOL: 0
-;PCODE: $00000333 VOL: 0
-;PCODE: $00000334 VOL: 0
-;PCODE: $00000335 VOL: 0
-;PCODE: $00000336 VOL: 0
-;PCODE: $00000337 VOL: 0
-;PCODE: $00000338 VOL: 0
-;PCODE: $00000339 VOL: 0
-;PCODE: $0000033A VOL: 0
-; 0000 00BD }
-;PCODE: $0000033B VOL: 0
-;void check_error_state(){
-; 0000 00BF void check_error_state(){
-;PCODE: $0000033C VOL: 0
-;PCODE: $0000033D VOL: 0
-; 0000 00C0 // make changes to error state
-; 0000 00C1 
-; 0000 00C2 if (InPout150V < 132 && (M_D_L == 1 && M_EN == 1))
-;PCODE: $0000033E VOL: 0
-;PCODE: $0000033F VOL: 0
-;PCODE: $00000340 VOL: 0
-;PCODE: $00000341 VOL: 0
-;PCODE: $00000342 VOL: 0
-;PCODE: $00000343 VOL: 0
-;PCODE: $00000344 VOL: 0
-;PCODE: $00000345 VOL: 0
-;PCODE: $00000346 VOL: 0
-;PCODE: $00000347 VOL: 0
-;PCODE: $00000348 VOL: 0
-;PCODE: $00000349 VOL: 0
-;PCODE: $0000034A VOL: 0
-;PCODE: $0000034B VOL: 0
-;PCODE: $0000034C VOL: 0
-;PCODE: $0000034D VOL: 0
-;PCODE: $0000034E VOL: 0
-; 0000 00C3 {
-; 0000 00C4 // voltage below 132V, and lift lowering
-; 0000 00C5 error_state = 2;
-;PCODE: $0000034F VOL: 0
-;PCODE: $00000350 VOL: 0
-; 0000 00C6 }else
-;PCODE: $00000351 VOL: 0
-;PCODE: $00000352 VOL: 0
-; 0000 00C7 {
-; 0000 00C8 // no error state
-; 0000 00C9 error_state = 0;
-;PCODE: $00000353 VOL: 0
-; 0000 00CA }
-;PCODE: $00000354 VOL: 0
-; 0000 00CB }
-;PCODE: $00000355 VOL: 0
-;PCODE: $00000356 VOL: 0
-;void steady_voltage()
-; 0000 00CE {
-;PCODE: $00000357 VOL: 0
-;PCODE: $00000358 VOL: 0
-; 0000 00CF // wait for voltage to steady out to being between 160 and 140
-; 0000 00D0 
-; 0000 00D1 while(InPout150V>160 || InPout150V < 140){
-;PCODE: $00000359 VOL: 0
-;PCODE: $0000035A VOL: 0
-;PCODE: $0000035B VOL: 0
-;PCODE: $0000035C VOL: 0
-;PCODE: $0000035D VOL: 0
-;PCODE: $0000035E VOL: 0
-;PCODE: $0000035F VOL: 0
-;PCODE: $00000360 VOL: 0
-;PCODE: $00000361 VOL: 0
-; 0000 00D2 // keep waiting while greater then 160 or less then 140
-; 0000 00D3 delay_ms(2);
-;PCODE: $00000362 VOL: 0
-;PCODE: $00000363 VOL: 0
-;PCODE: $00000364 VOL: 0
-; 0000 00D4 }
-;PCODE: $00000365 VOL: 0
-;PCODE: $00000366 VOL: 0
-; 0000 00D5 // finally, should be between 160 and 140 so return
-; 0000 00D6 return;
-;PCODE: $00000367 VOL: 0
-; 0000 00D7 }
-;PCODE: $00000368 VOL: 0
-;void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias)
-; 0000 00DA {
-;PCODE: $00000369 VOL: 0
-;PCODE: $0000036A VOL: 0
-; 0000 00DB float Vt_0, Vt_1, Vt_2, Vt_truck;
-; 0000 00DC float I_LEDL, I_LEDR;
-; 0000 00DD // calculate R_line, Vt_truck, Pd_LEDL, Pd_LEDR
-; 0000 00DE 
-; 0000 00DF // measure vt0 through averaging 100 samples
-; 0000 00E0 Vt_0 = avg_read_vin_volt(100);
-;PCODE: $0000036B VOL: 0
-;PCODE: $0000036C VOL: 0
-;PCODE: $0000036D VOL: 0
-;PCODE: $0000036E VOL: 0
-;PCODE: $0000036F VOL: 0
-;PCODE: $00000370 VOL: 0
-;PCODE: $00000371 VOL: 0
-;	*R_line -> Y+34
-;	*Pd_LEDL -> R20,R21
-;	*Pd_LEDR -> R18,R19
-;	*Pd_bias -> R16,R17
-;	Vt_0 -> Y+26
-;	Vt_1 -> Y+22
-;	Vt_2 -> Y+18
-;	Vt_truck -> Y+14
-;	I_LEDL -> Y+10
-;	I_LEDR -> Y+6
-;PCODE: $00000372 VOL: 0
-;PCODE: $00000373 VOL: 0
-;PCODE: $00000374 VOL: 0
-;PCODE: $00000375 VOL: 0
-; 0000 00E1 
-; 0000 00E2 // turn left LED light and wait 30 ms
-; 0000 00E3 control_LED(1, 0);
-;PCODE: $00000376 VOL: 0
-;PCODE: $00000377 VOL: 0
-;PCODE: $00000378 VOL: 0
-;PCODE: $00000379 VOL: 0
-; 0000 00E4 delay_ms(30);
-;PCODE: $0000037A VOL: 0
-;PCODE: $0000037B VOL: 0
-;PCODE: $0000037C VOL: 0
-; 0000 00E5 
-; 0000 00E6 // measure Vt1 and I_LED.left over 100 samples avg
-; 0000 00E7 Vt_1 = avg_read_vin_volt(100);
-;PCODE: $0000037D VOL: 0
-;PCODE: $0000037E VOL: 0
-;PCODE: $0000037F VOL: 0
-;PCODE: $00000380 VOL: 0
-; 0000 00E8 // todo set I_LED.left to 1A... ?
-; 0000 00E9 I_LEDL = get_SENSE_led();
-;PCODE: $00000381 VOL: 0
-;PCODE: $00000382 VOL: 0
-; 0000 00EA 
-; 0000 00EB // turn right LED on (both on) and wait 50 ms
-; 0000 00EC control_LED(1, 1);
-;PCODE: $00000383 VOL: 0
-;PCODE: $00000384 VOL: 0
-;PCODE: $00000385 VOL: 0
-;PCODE: $00000386 VOL: 0
-; 0000 00ED delay_ms(50);
-;PCODE: $00000387 VOL: 0
-;PCODE: $00000388 VOL: 0
-;PCODE: $00000389 VOL: 0
-; 0000 00EE 
-; 0000 00EF // measure Vt2 and I_LED.right over 200 samples avg
-; 0000 00F0 Vt_2 = avg_read_vin_volt(200);
-;PCODE: $0000038A VOL: 0
-;PCODE: $0000038B VOL: 0
-;PCODE: $0000038C VOL: 0
-;PCODE: $0000038D VOL: 0
-; 0000 00F1 I_LEDR = get_SENSE_led();
-;PCODE: $0000038E VOL: 0
-;PCODE: $0000038F VOL: 0
-; 0000 00F2 
-; 0000 00F3 // calculate PdLEDL, PdLEDR, PdBias
-; 0000 00F4 *Pd_LEDL = (I_LEDL*Vt_out)/n_eff;
-;PCODE: $00000390 VOL: 0
-;PCODE: $00000391 VOL: 0
-;PCODE: $00000392 VOL: 0
-;PCODE: $00000393 VOL: 0
-;PCODE: $00000394 VOL: 0
-;PCODE: $00000395 VOL: 0
-;PCODE: $00000396 VOL: 0
-;PCODE: $00000397 VOL: 0
-; 0000 00F5 *Pd_LEDR = (I_LEDR*Vt_out)/n_eff;
-;PCODE: $00000398 VOL: 0
-;PCODE: $00000399 VOL: 0
-;PCODE: $0000039A VOL: 0
-;PCODE: $0000039B VOL: 0
-;PCODE: $0000039C VOL: 0
-;PCODE: $0000039D VOL: 0
-;PCODE: $0000039E VOL: 0
-;PCODE: $0000039F VOL: 0
-; 0000 00F6 
-; 0000 00F7 delay_ms(5*1000);
-;PCODE: $000003A0 VOL: 0
-;PCODE: $000003A1 VOL: 0
-; 0000 00F8 
-; 0000 00F9 // using equation 8 calculate RLine and store as constant
-; 0000 00FA *R_line = R_LINE_EQ_Two(Vt_0, Vt_1, Vt_2, *Pd_LEDL, *Pd_LEDR);
-;PCODE: $000003A2 VOL: 0
-;PCODE: $000003A3 VOL: 0
-;PCODE: $000003A4 VOL: 0
-;PCODE: $000003A5 VOL: 0
-;PCODE: $000003A6 VOL: 0
-;PCODE: $000003A7 VOL: 0
-;PCODE: $000003A8 VOL: 0
-;PCODE: $000003A9 VOL: 0
-;PCODE: $000003AA VOL: 0
-;PCODE: $000003AB VOL: 0
-;PCODE: $000003AC VOL: 0
-;PCODE: $000003AD VOL: 0
-;PCODE: $000003AE VOL: 0
-;PCODE: $000003AF VOL: 0
-;PCODE: $000003B0 VOL: 0
-; 0000 00FB delay_ms(5*1000); // wait 5 seconds
-;PCODE: $000003B1 VOL: 0
-;PCODE: $000003B2 VOL: 0
-; 0000 00FC 
-; 0000 00FD // using equation 7 calculate external bias power pdbias and store as semi-constant variable
-; 0000 00FE *Pd_bias = Pd_bias_one_two(Vt_0, Vt_1, *Pd_LEDL, *R_line);
-;PCODE: $000003B3 VOL: 0
-;PCODE: $000003B4 VOL: 0
-;PCODE: $000003B5 VOL: 0
-;PCODE: $000003B6 VOL: 0
-;PCODE: $000003B7 VOL: 0
-;PCODE: $000003B8 VOL: 0
-;PCODE: $000003B9 VOL: 0
-;PCODE: $000003BA VOL: 0
-;PCODE: $000003BB VOL: 0
-;PCODE: $000003BC VOL: 0
-;PCODE: $000003BD VOL: 0
-;PCODE: $000003BE VOL: 0
-;PCODE: $000003BF VOL: 0
-; 0000 00FF 
-; 0000 0100 // using equation 3 measure truck voltage Vtruck
-; 0000 0101 Vt_truck = two_load_V_truck(Vt_2, *Pd_bias, *Pd_LEDL, *Pd_LEDR, *R_line);
-;PCODE: $000003C0 VOL: 0
-;PCODE: $000003C1 VOL: 0
-;PCODE: $000003C2 VOL: 0
-;PCODE: $000003C3 VOL: 0
-;PCODE: $000003C4 VOL: 0
-;PCODE: $000003C5 VOL: 0
-;PCODE: $000003C6 VOL: 0
-;PCODE: $000003C7 VOL: 0
-;PCODE: $000003C8 VOL: 0
-;PCODE: $000003C9 VOL: 0
-;PCODE: $000003CA VOL: 0
-;PCODE: $000003CB VOL: 0
-;PCODE: $000003CC VOL: 0
-;PCODE: $000003CD VOL: 0
-;PCODE: $000003CE VOL: 0
-;PCODE: $000003CF VOL: 0
-; 0000 0102 
-; 0000 0103 //todo keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-; 0000 0104 
-; 0000 0105 //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-; 0000 0106 
-; 0000 0107 }
-;PCODE: $000003D0 VOL: 0
-;PCODE: $000003D1 VOL: 0
-;PCODE: $000003D2 VOL: 0
-;PCODE: $000003D3 VOL: 0
-;void Show_Value (unsigned int In)
-; 0000 010A {
-;PCODE: $000003D4 VOL: 0
-;PCODE: $000003D5 VOL: 0
-; 0000 010B // display integer on 3 digit 7-segment display
-; 0000 010C if(InPout150V <= 100)
-;PCODE: $000003D6 VOL: 0
-;PCODE: $000003D7 VOL: 0
-;PCODE: $000003D8 VOL: 0
-;	In -> R16,R17
-;PCODE: $000003D9 VOL: 0
-;PCODE: $000003DA VOL: 0
-;PCODE: $000003DB VOL: 0
-; 0000 010D {
-; 0000 010E DISPLAY[1] = 19;//Err
-;PCODE: $000003DC VOL: 0
-;PCODE: $000003DD VOL: 0
-;PCODE: $000003DE VOL: 0
-; 0000 010F DISPLAY[2] = 20;
-;PCODE: $000003DF VOL: 0
-;PCODE: $000003E0 VOL: 0
-;PCODE: $000003E1 VOL: 0
-; 0000 0110 DISPLAY[3] = 20;
-;PCODE: $000003E2 VOL: 0
-;PCODE: $000003E3 VOL: 0
-;PCODE: $000003E4 VOL: 0
-; 0000 0111 }
-; 0000 0112 else
-;PCODE: $000003E5 VOL: 0
-;PCODE: $000003E6 VOL: 0
-; 0000 0113 {
-; 0000 0114 DISPLAY[1] = ((In / 100) % 10);
-;PCODE: $000003E7 VOL: 0
-;PCODE: $000003E8 VOL: 0
-;PCODE: $000003E9 VOL: 0
-;PCODE: $000003EA VOL: 0
-;PCODE: $000003EB VOL: 0
-;PCODE: $000003EC VOL: 0
-;PCODE: $000003ED VOL: 0
-;PCODE: $000003EE VOL: 0
-; 0000 0115 DISPLAY[2] = ((In / 10) % 10);
-;PCODE: $000003EF VOL: 0
-;PCODE: $000003F0 VOL: 0
-;PCODE: $000003F1 VOL: 0
-;PCODE: $000003F2 VOL: 0
-;PCODE: $000003F3 VOL: 0
-;PCODE: $000003F4 VOL: 0
-;PCODE: $000003F5 VOL: 0
-;PCODE: $000003F6 VOL: 0
-; 0000 0116 DISPLAY[3] = ((In / 1) % 10);
-;PCODE: $000003F7 VOL: 0
-;PCODE: $000003F8 VOL: 0
-;PCODE: $000003F9 VOL: 0
-;PCODE: $000003FA VOL: 0
-;PCODE: $000003FB VOL: 0
-; 0000 0117 }
-;PCODE: $000003FC VOL: 0
-; 0000 0118 }
-;PCODE: $000003FD VOL: 0
-;PCODE: $000003FE VOL: 0
-;PCODE: $000003FF VOL: 0
-;void motor_loop(float In150V_Val)
-; 0000 011B {
-;PCODE: $00000400 VOL: 0
-;PCODE: $00000401 VOL: 0
-; 0000 011C // control motor according to the In150V_Val
-; 0000 011D if(In150V_Val > 160)
-;PCODE: $00000402 VOL: 0
-;	In150V_Val -> Y+0
-;PCODE: $00000403 VOL: 0
-;PCODE: $00000404 VOL: 0
-;PCODE: $00000405 VOL: 0
-;PCODE: $00000406 VOL: 0
-; 0000 011E {
-; 0000 011F // lift UP
-; 0000 0120 Motor_R_L_Off(Right);// Right Left OFF
-;PCODE: $00000407 VOL: 0
-;PCODE: $00000408 VOL: 0
-; 0000 0121 // cheek motor curent
-; 0000 0122 }
-; 0000 0123 
-; 0000 0124 else if((In150V_Val < 140) && (In150V_Val > 105))
-;PCODE: $00000409 VOL: 0
-;PCODE: $0000040A VOL: 0
-;PCODE: $0000040B VOL: 0
-;PCODE: $0000040C VOL: 0
-;PCODE: $0000040D VOL: 0
-;PCODE: $0000040E VOL: 0
-;PCODE: $0000040F VOL: 0
-;PCODE: $00000410 VOL: 0
-;PCODE: $00000411 VOL: 0
-;PCODE: $00000412 VOL: 0
-;PCODE: $00000413 VOL: 0
-;PCODE: $00000414 VOL: 0
-;PCODE: $00000415 VOL: 0
-;PCODE: $00000416 VOL: 0
-; 0000 0125 {
-; 0000 0126 // lift DOWN
-; 0000 0127 Motor_R_L_Off(Left);// Right Left OFF
-;PCODE: $00000417 VOL: 0
-;PCODE: $00000418 VOL: 0
-; 0000 0128 
-; 0000 0129 if (In150V_Val < 132){
-;PCODE: $00000419 VOL: 0
-;PCODE: $0000041A VOL: 0
-;PCODE: $0000041B VOL: 0
-;PCODE: $0000041C VOL: 0
-; 0000 012A // turn off one headlamp until lift stops moving
-; 0000 012B control_LED(ON, OFF);
-;PCODE: $0000041D VOL: 0
-;PCODE: $0000041E VOL: 0
-;PCODE: $0000041F VOL: 0
-;PCODE: $00000420 VOL: 0
-; 0000 012C }
-; 0000 012D }
-;PCODE: $00000421 VOL: 0
-; 0000 012E 
-; 0000 012F else
-;PCODE: $00000422 VOL: 0
-;PCODE: $00000423 VOL: 0
-; 0000 0130 {
-; 0000 0131 // lift STOP
-; 0000 0132 control_LED(ON,ON);
-;PCODE: $00000424 VOL: 0
-;PCODE: $00000425 VOL: 0
-;PCODE: $00000426 VOL: 0
-;PCODE: $00000427 VOL: 0
-; 0000 0133 
-; 0000 0134 Motor_R_L_Off(OFF);// Right Left OFF
-;PCODE: $00000428 VOL: 0
-;PCODE: $00000429 VOL: 0
-; 0000 0135 }
-;PCODE: $0000042A VOL: 0
-;PCODE: $0000042B VOL: 0
-; 0000 0136 }
-;PCODE: $0000042C VOL: 0
-;PCODE: $0000042D VOL: 0
-;PCODE: $0000042E VOL: 0

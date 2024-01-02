@@ -1,10 +1,9 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-zero_buffer                                                                       0x0300       4
-AveInPout150V                                                                     0x0304       4
-DISPLAY                                                                           0x0308       4
-SegmentData                                                                       0x030C      52
+AveInPout150V                                                                     0x0300       4
+DISPLAY                                                                           0x0304       4
+SegmentData                                                                       0x0308      52
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -15,16 +14,14 @@ Variable                                                                        
 ------------------------------------------------------------------------------------------------
 InPout150V                                                                        R3,R4        2
 FreeCount                                                                         R5,R6        2
-DISPLAY_Counter                                                                   R8           1
+error_state                                                                       R8           1
+DISPLAY_Counter                                                                   R7           1
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-Motor_R_L_Off                                                                     0x0008C     18
-control_LED                                                                       0x0009E     20
-read_adc                                                                          0x000B2     29
-timer0_ovf_isr                                                                    0x000CF    108
-main                                                                              0x0013B    110
-steady_voltage                                                                    0x001A9     15
-Show_Value                                                                        0x001B8     36
-motor_loop                                                                        0x001DC     49
+control_LED                                                                       0x00087     20
+read_adc                                                                          0x0009B     29
+timer0_ovf_isr                                                                    0x000B8    143
+main                                                                              0x00147    102
+TEST_show_value                                                                   0x001AD     23

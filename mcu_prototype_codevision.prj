@@ -133,9 +133,9 @@ UseBootAppXmega=0
 UseUDSC_LGT8F=1
 RebuildAll=0
 LinkageInformationPresent=1
-COFFileTimeStamp=1469350397
-Build=24
-GlobalVarAddr=832
+COFFileTimeStamp=1478657643
+Build=40
+GlobalVarAddr=828
 EEPROMVarAddr=0
 [DefinedSymbolsDebug]
 Count=0
@@ -247,7 +247,7 @@ UseUDSC_LGT8F=1
 RebuildAll=1
 LinkageInformationPresent=0
 COFFileTimeStamp=-1
-Build=24
+Build=40
 [DefinedSymbols]
 Count=0
 [CompilerAdvanced]
@@ -399,41 +399,41 @@ L13=Enhanced function parameters passing: Mode 2
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 24
-L18=1551 line(s) compiled
-L19=4 error(s)
-L20=7 warning(s)
+L17=Build: 40
+L18=1425 line(s) compiled
+L19=No errors
+L20=2 warning(s)
 L21=
 L22=Bit variables size: 0 byte(s)
 L23=
 L24=Data Stack area: 0x100 to 0x2FF
 L25=Data Stack size: 512 byte(s)
-L26=Estimated Data Stack usage: 0 byte(s)
+L26=Estimated Data Stack usage: 27 byte(s)
 L27=
-L28=RAM Global variables size: 0 byte(s)
-L29=
-L30=Hardware Stack area: 0x300 to 0x8FF
-L31=Hardware Stack size: 1536 byte(s)
-L32=
-L33=Heap size: 0 byte(s)
-L34=
-L35=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-Lines=35
+L28=RAM Global variables area: 0x300 to 0x33B
+L29=RAM Global variables size: 60 byte(s)
+L30=
+L31=Hardware Stack area: 0x33C to 0x8FF
+L32=Hardware Stack size: 1476 byte(s)
+L33=
+L34=Heap size: 0 byte(s)
+L35=
+Lines=38
 L36=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-L37=Program size: 1059 words (2118 bytes), 6.5% of FLASH
-L38=51 words (102 bytes), 4.6% reduced by Code Compression
+L37=Program size: 949 words (1898 bytes), 5.8% of FLASH
+L38=20 words (40 bytes), 2.1% reduced by Code Compression
 [BuildInfoAssembler]
-Lines=0
+Lines=12
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\Users\agent\Desktop\MCU_Prototype_Cleaner\Debug\List\mcu_prototype_codevision.asm(2915): No EEPROM data, deleting C:\Users\agent\Desktop\MCU_Prototype_Cleaner\Debug\Exe\mcu_prototype_codevision.eep
+L4=C:\Users\agent\Desktop\MCU_Prototype_Cleaner\Debug\List\mcu_prototype_codevision.asm(2721): No EEPROM data, deleting C:\Users\agent\Desktop\MCU_Prototype_Cleaner\Debug\Exe\mcu_prototype_codevision.eep
 L5=
 L6=ATmega328P memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x000846   2036     82   2118   32768   6.5%
-L10=[.dseg] 0x000100 0x000340      0     64     64    2048   3.1%
+L9=[.cseg] 0x000000 0x00076a   1826     72   1898   32768   5.8%
+L10=[.dseg] 0x000100 0x00033c      0     60     60    2048   2.9%
 L11=[.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 L12=
 [Bookmarks2]
@@ -574,20 +574,19 @@ BK6=-1
 BK7=-1
 BK8=-1
 BK9=-1
-[HeadersList]
-Files=1
-F1=C:\Users\agent\Desktop\MCU_Prototype_Cleaner\mcu_prototype_codevision.c
-[Header1]
-Files=6
-F1=C:\cvavreval\inc\mega328p.h
-F2=C:\cvavreval\inc\mega328p_bits.h
-F3=C:\cvavreval\inc\delay.h
-F4=equations.c
-F5=controllers.c
-F6=Init.c
 [FoldedCode2]
 Blocks=0
 [FoldedCode9]
 Blocks=0
 [FoldedCode7]
 Blocks=0
+[HeadersList]
+Files=1
+F1=C:\Users\agent\Desktop\MCU_Prototype_Cleaner\mcu_prototype_codevision.c
+[Header1]
+Files=5
+F1=C:\cvavreval\inc\mega328p.h
+F2=C:\cvavreval\inc\mega328p_bits.h
+F3=C:\cvavreval\inc\delay.h
+F4=controllers.c
+F5=Init.c

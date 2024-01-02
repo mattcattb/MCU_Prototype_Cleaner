@@ -42,16 +42,14 @@ Data Stack size         : 512
 void motor_loop(float In150V_Val); 
 void Show_Value (unsigned int In);
 void steady_voltage();
+void check_error_state();
+void TEST_show_value(unsigned int In);
+
 
 // global IN150v values
 unsigned long AveInPout150V = 0;
 unsigned int InPout150V = 0;
 unsigned int FreeCount = 0;
-
-// constant n_eff, Voltage out
-const float n_eff = 0.7;
-const float Vt_out = 24;
-float Vlm_0 = 0;
  
 unsigned char error_state = 1; // error state starts in boot up (1)
 unsigned char DISPLAY_Counter = 0; // what digit to display
@@ -79,41 +77,41 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
     Seg3 = 1;             
     
     if(DISPLAY_Counter == 0)
-        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         SegData = SegmentData[DISPLAY[1]];   
         
         // mask data to turn on dot if error code suggests it   
-        if (error_state & 0b100 == 0b100){
+        if (((error_state >> 2) & 0b001) == 0b001){  
             SegData = SegData | dot_mask;
         }
 
         DISPLAY_Counter++;
         Seg3 = 0;
-        }
+    }
     else if( DISPLAY_Counter == 1)
-        {
-        SegData = SegmentData[DISPLAY[2]];
-
-        if (error_state & 0b010 == 0b010){
+    {
+        SegData = SegmentData[DISPLAY[2]]; 
+        
+        if (((error_state >> 1) & 0b001) == 0b001){
             SegData = SegData | dot_mask;
         }
 
         DISPLAY_Counter++;
         Seg2 = 0;
-        }
+    }
     else
-        {
+    {
         SegData = SegmentData[DISPLAY[3]];
+                                      
         
-        if (error_state & 0b001 == 0b001){
+        if (((error_state >> 0) & 0b001) == 0b001){
             SegData = SegData | dot_mask;
         }
 
         DISPLAY_Counter = 0;
         Seg1 = 0;
-        }
-    //------------------------------ 
-    // AveInPout150V += read_vin_volt();                         
+    }
+
     // this should properly scale between 100-200 volts 
     AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
                  
@@ -126,54 +124,40 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
         AveInPout150V=0;    
     } 
     
-    //------------------------------ 
 }
 
 void main(void)
 {
-    // power variables
-    float Pd_bias;
-    float Pd_LEDL;
-    float Pd_LEDR;
-
-    // voltage of truck
-    float Vt_truck;
-
-    // resistance of line 
-    float R_Line_val; 
-
+    float temp_val;
     #include <Init.c>
                           
     delay_ms(5*1000); 
-    
-    control_LED(ON, ON);            
-    
-    // configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
-    // voltage_calc_phase(&R_Line_val, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
-
-    control_LED(ON, ON);
+                   
+    // turn both LEDs on  
+    control_LED(ON, ON);           
               
     // wait for first voltage to be between 140 and 160
-    steady_voltage();
+    //! steady_voltage();
 
     // set both drivers low and enable on 
     M_D_R = 0;
     M_D_L = 0;
-    M_EN = 0;
-
+    M_EN = 0;  
+    
     while (1)
     {
 
-        check_error_state();
+        //! check_error_state();
         
         //! make this more accurate!
-        float temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
+        // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
       
-        // set value to be shown on 7-seg display
-        Show_Value(temp_val); 
+        // set value to be shown on 7-seg display        
+        //! SWITCH TO SHOW VOLTAGE VALUE !!!
+        Show_Value(InPout150V);
 
         // control motor based on reading
-        motor_loop(temp_val);
+        motor_loop(InPout150V);
 
         //! add droop compensation here!
 
@@ -184,7 +168,7 @@ void main(void)
 void check_error_state(){
     // make changes to error state 
     
-    if (InPout150V < 132 && (M_D_L == 1 && M_EN == 1))
+    if (InPout150V < 132 && (get_motor_state() == Down))
     {                    
         // voltage below 132V, and lift lowering 
         error_state = 2; 
@@ -205,6 +189,15 @@ void steady_voltage()
     }
     // finally, should be between 160 and 140 so return
     return;
+}
+
+void TEST_show_value(unsigned int In)
+{
+    // display integer on 3 digit 7-segment display 
+    DISPLAY[1] = ((In / 100) % 10);
+    DISPLAY[2] = ((In / 10) % 10);
+    DISPLAY[3] = ((In / 1) % 10);
+
 }
 
 void Show_Value (unsigned int In)
@@ -252,18 +245,18 @@ void motor_loop(float In150V_Val)
         return;
     }
 
-    if (get_motor_state == Up && (In150V_Val < latch_val)){
+    if (get_motor_state() == Up && (In150V_Val < latch_val)){
         // motor is going up and latch was bypassed!
 
         // stop motor
-        Motor_R_L_Off(Off);
+        Motor_R_L_Off(OFF);
     }
 
-    if (get_motor_state == Down && (In150V_Val > latch_val)){
+    if (get_motor_state() == Down && (In150V_Val > latch_val)){
         // motor is going down and latch was bypassed!
 
         // stop motor
-        Motor_R_L_Off(Off);
+        Motor_R_L_Off(OFF);
     }
 
 

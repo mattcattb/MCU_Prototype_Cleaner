@@ -30,7 +30,6 @@ Data Stack size         : 512
 #include <mega328p.h>
 // Delay functions
 #include <delay.h>
-#include <equations.c>
 #include <controllers.c>
 
 // 7-seg display
@@ -40,21 +39,17 @@ Data Stack size         : 512
 #define SegData PORTD
 
 // helper functions
-void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias);
 void motor_loop(float In150V_Val); 
 void Show_Value (unsigned int In);
 void steady_voltage();
-void motor_setup();
+void check_error_state();
+void TEST_show_value(unsigned int In);
+
 
 // global IN150v values
 unsigned long AveInPout150V = 0;
 unsigned int InPout150V = 0;
 unsigned int FreeCount = 0;
-
-// constant n_eff, Voltage out
-const float n_eff = 0.7;
-const float Vt_out = 24;
-float Vlm_0 = 0;
  
 unsigned char error_state = 1; // error state starts in boot up (1)
 unsigned char DISPLAY_Counter = 0; // what digit to display
@@ -84,20 +79,36 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
     if(DISPLAY_Counter == 0)
         {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         SegData = SegmentData[DISPLAY[1]];   
-        // mask data to turn on dot 
-        SegData = SegData | dot_mask;
+        
+        // mask data to turn on dot if error code suggests it   
+        if (((error_state >> 2) & 0b001) == 0b001){  
+            // TEST_show_value(50);
+            SegData = SegData | dot_mask;
+        }
+
         DISPLAY_Counter++;
         Seg3 = 0;
         }
     else if( DISPLAY_Counter == 1)
         {
-        SegData = SegmentData[DISPLAY[2]];
+        SegData = SegmentData[DISPLAY[2]]; 
+        
+        if (((error_state >> 1) & 0b001) == 0b001){
+            SegData = SegData | dot_mask;
+        }
+
         DISPLAY_Counter++;
         Seg2 = 0;
         }
     else
         {
         SegData = SegmentData[DISPLAY[3]];
+                                      
+        
+        if (((error_state >> 0) & 0b001) == 0b001){
+            SegData = SegData | dot_mask;
+        }
+
         DISPLAY_Counter = 0;
         Seg1 = 0;
         }
@@ -108,12 +119,11 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
                  
     
     if(FreeCount++ >= n)
-        {
+    {
+        // calculate average once n readings have been reached
         FreeCount = 0;
         InPout150V = (AveInPout150V/n);
         AveInPout150V=0;    
-//            if(FreeCount2 == 0){LEDS_On_Off(OFF, OFF); FreeCount2 = 2; }
-//            else {LEDS_On_Off(ON, ON); FreeCount2 = 0; }
     } 
     
     //------------------------------ 
@@ -121,69 +131,48 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 
 void main(void)
 {
-    // power variables
-    float Pd_bias;
-    float Pd_LEDL;
-    float Pd_LEDR;
-
-    // voltage of truck
-    float Vt_truck;
-
-    // resistance of line 
-    float R_Line_val; 
-
+    float temp_val;
     #include <Init.c>
                           
-    delay_ms(5*1000); 
-    
-    control_LED(ON, ON);            
-    
-    // configure voltage calculations for R_line, Pd_LEDL, Pd_LEDR, Pd_bias
-    // voltage_calc_phase(&R_Line_val, &Pd_LEDL, &Pd_LEDR, &Pd_bias);
-
-    control_LED(ON, ON);
+    // delay_ms(5*1000); 
+                   
+    // turn both LEDs on  
+    control_LED(ON, ON);           
               
     // wait for first voltage to be between 140 and 160
-    steady_voltage();
-
-    motor_setup();
-
-    while (1)
-    {
-        check_error_state();
-        
-        // Vt_truck = calculate_truck_voltage(InPout150V, R_Line_val, Pd_LEDL, Pd_LEDR, Pd_bias);
-        float temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
-      
-        // set value to be shown on 7-seg display
-        Show_Value(temp_val); 
-
-        // control motor based on reading
-        motor_loop(temp_val);
-
-    }
-}
-
-void motor_setup(){
+    // steady_voltage();
 
     // set both drivers low and enable on 
     M_D_R = 0;
     M_D_L = 0;
-    M_EN = 0;
+    M_EN = 0;  
     
+    TEST_show_value(error_state); 
+
+    while (1)
+    {
+
+        // check_error_state();
+        
+        //! make this more accurate!
+        // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
+      
+        // set value to be shown on 7-seg display        
+        //! SWITCH TO SHOW VOLTAGE VALUE !!!
+
+        // control motor based on reading
+        // motor_loop(temp_val);
+
+        //! add droop compensation here!
+
+    }
 }
 
-float get_motor_current(){
-    // get motor current by measuring pin 19 
-    float Vread = read_adc(M_R_Sense);
-    float I_motor = (Vread - Vlm_0)/6.5;
-    return I_motor;
-}
 
 void check_error_state(){
     // make changes to error state 
     
-    if (InPout150V < 132 && (M_D_L == 1 && M_EN == 1))
+    if (InPout150V < 132 && (get_motor_state() == Down))
     {                    
         // voltage below 132V, and lift lowering 
         error_state = 2; 
@@ -206,51 +195,12 @@ void steady_voltage()
     return;
 }
 
-void voltage_calc_phase(float *R_line, float *Pd_LEDL, float *Pd_LEDR, float *Pd_bias)
+void TEST_show_value(unsigned int In)
 {
-    float Vt_0, Vt_1, Vt_2, Vt_truck;   
-    float I_LEDL, I_LEDR;
-    // calculate R_line, Vt_truck, Pd_LEDL, Pd_LEDR
-
-    // measure vt0 through averaging 100 samples
-    Vt_0 = avg_read_vin_volt(100);
-
-    // turn left LED light and wait 30 ms
-    control_LED(1, 0);
-    delay_ms(30);
-
-    // measure Vt1 and I_LED.left over 100 samples avg
-    Vt_1 = avg_read_vin_volt(100);
-    // todo set I_LED.left to 1A... ?
-    I_LEDL = get_SENSE_led();
-
-    // turn right LED on (both on) and wait 50 ms
-    control_LED(1, 1);
-    delay_ms(50);
-
-    // measure Vt2 and I_LED.right over 200 samples avg
-    Vt_2 = avg_read_vin_volt(200);
-    I_LEDR = get_SENSE_led();
-
-    // calculate PdLEDL, PdLEDR, PdBias
-    *Pd_LEDL = (I_LEDL*Vt_out)/n_eff;
-    *Pd_LEDR = (I_LEDR*Vt_out)/n_eff;
-                                                            
-    delay_ms(5*1000); 
-    
-    // using equation 8 calculate RLine and store as constant 
-    *R_line = R_LINE_EQ_Two(Vt_0, Vt_1, Vt_2, *Pd_LEDL, *Pd_LEDR);                      
-    delay_ms(5*1000); // wait 5 seconds                           
-    
-    // using equation 7 calculate external bias power pdbias and store as semi-constant variable
-    *Pd_bias = Pd_bias_one_two(Vt_0, Vt_1, *Pd_LEDL, *R_line);
-
-    // using equation 3 measure truck voltage Vtruck
-    Vt_truck = two_load_V_truck(Vt_2, *Pd_bias, *Pd_LEDL, *Pd_LEDR, *R_line);
-
-    //todo keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
-
-    //! keep rolling 100 sample over 100ms average of Vt2 (operating input voltage)
+    // display integer on 3 digit 7-segment display 
+    DISPLAY[1] = ((In / 100) % 10);
+    DISPLAY[2] = ((In / 10) % 10);
+    DISPLAY[3] = ((In / 1) % 10);
 
 }
 
@@ -273,15 +223,21 @@ void Show_Value (unsigned int In)
 
 void motor_loop(float In150V_Val)
 {
-    // control motor according to the In150V_Val
+    //! make this have latch functionality 
+
+    float latch_val = 150; 
+
+    // if voltage > 160, go up 
     if(In150V_Val > 160)
     {            
         // lift UP 
         Motor_R_L_Off(Right);// Right Left OFF 
-        // cheek motor curent
+
+        return;
     }
 
-    else if((In150V_Val < 140) && (In150V_Val > 105))
+    // if voltage between 140,105 go down 
+    if((In150V_Val < 140) && (In150V_Val > 105))
     {                                          
         // lift DOWN
         Motor_R_L_Off(Left);// Right Left OFF 
@@ -290,13 +246,24 @@ void motor_loop(float In150V_Val)
             // turn off one headlamp until lift stops moving
             control_LED(ON, OFF);
         } 
+        return;
     }
 
-    else
-    {         
-        // lift STOP
-        control_LED(ON,ON);    
+    if (get_motor_state() == Up && (In150V_Val < latch_val)){
+        // motor is going up and latch was bypassed!
 
-        Motor_R_L_Off(OFF);// Right Left OFF 
+        // stop motor
+        Motor_R_L_Off(OFF);
     }
+
+    if (get_motor_state() == Down && (In150V_Val > latch_val)){
+        // motor is going down and latch was bypassed!
+
+        // stop motor
+        Motor_R_L_Off(OFF);
+    }
+
+
 }
+
+
