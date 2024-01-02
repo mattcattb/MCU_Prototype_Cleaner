@@ -74,7 +74,7 @@ unsigned char SegmentData[] =
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
     float n = 300;
-    unsigned cha r dot_mask = 0b10000000;
+    unsigned char dot_mask = 0b10000000;
     // here display 1 of the digits and add to the sum to calculate the average over 300 readings 
     Seg1 = 1;
     Seg2 = 1;
@@ -145,7 +145,10 @@ void main(void)
     // wait for first voltage to be between 140 and 160
     steady_voltage();
 
-    motor_setup();
+    // set both drivers low and enable on 
+    M_D_R = 0;
+    M_D_L = 0;
+    M_EN = 0;
 
     while (1)
     {
@@ -161,24 +164,6 @@ void main(void)
         motor_loop(temp_val);
 
     }
-}
-
-void motor_setup(){
-
-    // set both drivers low and enable on 
-    M_D_R = 0;
-    M_D_L = 0;
-    M_EN = 1;
-
-    // get Vlm.0 by measuring pin 19 
-    //! need to setup ADC 6 for this 
-    Vlm_0 = read_adc(M_R_Sense);
-
-
-    // measure motor current with (Vread-Vlm.0)/6.5 amps
-
-
-
 }
 
 float get_motor_current(){
