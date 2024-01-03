@@ -44,6 +44,8 @@ void Show_Value (unsigned int In);
 void steady_voltage();
 void check_error_state();
 void TEST_show_value(unsigned int In);
+float read_vin_scaled();
+
 
 
 // global IN150v values
@@ -69,8 +71,13 @@ unsigned char SegmentData[] =
 // Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
+
+    // use this to find InPout150V, the average over n readings
+    // also, display whatever is stored in DISPLAY[] on the 7-seg display 
+
     float n = 300;
     unsigned char dot_mask = 0b10000000;
+    
     // here display 1 of the digits and add to the sum to calculate the average over 300 readings 
     Seg1 = 1;
     Seg2 = 1;
@@ -112,9 +119,8 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
         Seg1 = 0;
     }
 
-    // this should properly scale between 100-200 volts 
-    AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
-                 
+    // add ith reading to sum of readings 
+    AveInPout150V += read_vin_scaled();      
     
     if(FreeCount++ >= n)
     {
@@ -124,6 +130,11 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
         AveInPout150V=0;    
     } 
     
+}
+
+float read_vin_scaled(){
+    // read and scale voltage from vin 
+    return (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
 }
 
 void main(void)
@@ -137,7 +148,7 @@ void main(void)
     control_LED(ON, ON);           
               
     // wait for first voltage to be between 140 and 160
-    //! steady_voltage();
+    //? steady_voltage();
 
     // set both drivers low and enable on 
     M_D_R = 0;
@@ -147,23 +158,19 @@ void main(void)
     while (1)
     {
 
-        //! check_error_state();
-        
-        //! make this more accurate!
-        // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
-      
+        //? check_error_state();
+              
         // set value to be shown on 7-seg display        
         //! SWITCH TO SHOW VOLTAGE VALUE !!!
         Show_Value(InPout150V);
 
         // control motor based on reading
-        motor_loop(InPout150V);
+        //? motor_loop(InPout150V);
 
         //! add droop compensation here!
 
     }
 }
-
 
 void check_error_state(){
     // make changes to error state 
@@ -182,12 +189,14 @@ void check_error_state(){
 void steady_voltage()
 {
     // wait for voltage to steady out to being between 160 and 140
-    
+    error_state = 4;
     while(InPout150V>160 || InPout150V < 140){
-        // keep waiting while greater then 160 or less then 140
+        // keep waiting while greater then 160 or less then 140     
+        Show_Value(InPout150V);
         delay_ms(2);
     }
     // finally, should be between 160 and 140 so return
+    error_state = 0;
     return;
 }
 

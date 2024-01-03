@@ -77,20 +77,19 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
     Seg3 = 1;             
     
     if(DISPLAY_Counter == 0)
-        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         SegData = SegmentData[DISPLAY[1]];   
         
         // mask data to turn on dot if error code suggests it   
         if (((error_state >> 2) & 0b001) == 0b001){  
-            // TEST_show_value(50);
             SegData = SegData | dot_mask;
         }
 
         DISPLAY_Counter++;
         Seg3 = 0;
-        }
+    }
     else if( DISPLAY_Counter == 1)
-        {
+    {
         SegData = SegmentData[DISPLAY[2]]; 
         
         if (((error_state >> 1) & 0b001) == 0b001){
@@ -99,9 +98,9 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 
         DISPLAY_Counter++;
         Seg2 = 0;
-        }
+    }
     else
-        {
+    {
         SegData = SegmentData[DISPLAY[3]];
                                       
         
@@ -111,9 +110,8 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 
         DISPLAY_Counter = 0;
         Seg1 = 0;
-        }
-    //------------------------------ 
-    // AveInPout150V += read_vin_volt();                         
+    }
+
     // this should properly scale between 100-200 volts 
     AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
                  
@@ -126,7 +124,6 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
         AveInPout150V=0;    
     } 
     
-    //------------------------------ 
 }
 
 void main(void)
@@ -134,34 +131,33 @@ void main(void)
     float temp_val;
     #include <Init.c>
                           
-    // delay_ms(5*1000); 
+    delay_ms(5*1000); 
                    
     // turn both LEDs on  
     control_LED(ON, ON);           
               
     // wait for first voltage to be between 140 and 160
-    // steady_voltage();
+    steady_voltage();
 
     // set both drivers low and enable on 
     M_D_R = 0;
     M_D_L = 0;
     M_EN = 0;  
     
-    TEST_show_value(error_state); 
-
     while (1)
     {
 
-        // check_error_state();
+        check_error_state();
         
         //! make this more accurate!
         // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
       
         // set value to be shown on 7-seg display        
         //! SWITCH TO SHOW VOLTAGE VALUE !!!
+        Show_Value(InPout150V);
 
         // control motor based on reading
-        // motor_loop(temp_val);
+        motor_loop(InPout150V);
 
         //! add droop compensation here!
 
@@ -186,12 +182,14 @@ void check_error_state(){
 void steady_voltage()
 {
     // wait for voltage to steady out to being between 160 and 140
-    
+    error_state = 4;
     while(InPout150V>160 || InPout150V < 140){
-        // keep waiting while greater then 160 or less then 140
+        // keep waiting while greater then 160 or less then 140     
+        Show_Value(InPout150V);'
         delay_ms(2);
     }
     // finally, should be between 160 and 140 so return
+    error_state = 0;
     return;
 }
 

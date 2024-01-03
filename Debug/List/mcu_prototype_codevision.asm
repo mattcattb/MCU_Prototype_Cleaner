@@ -1465,7 +1465,7 @@ __START_OF_CODE:
 ;GLOBAL REGISTER VARIABLES INITIALIZATION
 __REG_VARS:
 	.DB  0x0,0x0,0x0,0x0
-	.DB  0x0,0x4
+	.DB  0x0,0x1
 
 _0x38:
 	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
@@ -1581,7 +1581,61 @@ __GLOBAL_INI_END:
 ; 0000 0021 {
 
 	.CSEG
+_Motor_R_L_Off:
+; .FSTART _Motor_R_L_Off
+	ST   -Y,R17
+	MOV  R17,R26
 ;	Motor -> R17
+	CPI  R17,1
+	BRNE _0x3
+	CBI  0x8,4
+	SBI  0x8,3
+	SBI  0x8,5
+	RJMP _0xA
+_0x3:
+	CPI  R17,2
+	BRNE _0xB
+	SBI  0x8,4
+	CBI  0x8,3
+	SBI  0x8,5
+	RJMP _0x12
+_0xB:
+	CBI  0x8,4
+	CBI  0x8,3
+	CBI  0x8,5
+_0x12:
+_0xA:
+	RJMP _0x2000002
+; .FEND
+_get_motor_state:
+; .FSTART _get_motor_state
+	SBIS 0x8,4
+	RJMP _0x1A
+	SBIS 0x8,3
+	RJMP _0x1B
+_0x1A:
+	RJMP _0x19
+_0x1B:
+	LDI  R30,LOW(2)
+	LDI  R31,HIGH(2)
+	RET
+_0x19:
+	SBIC 0x8,4
+	RJMP _0x1E
+	SBIC 0x8,3
+	RJMP _0x1F
+_0x1E:
+	RJMP _0x1D
+_0x1F:
+	LDI  R30,LOW(1)
+	LDI  R31,HIGH(1)
+	RET
+_0x1D:
+	LDI  R30,LOW(0)
+	LDI  R31,HIGH(0)
+	RET
+	RET
+; .FEND
 _control_LED:
 ; .FSTART _control_LED
 	ST   -Y,R17
@@ -1632,6 +1686,7 @@ _0x31:
 	STS  122,R30
 	LDS  R30,120
 	LDS  R31,120+1
+_0x2000002:
 	LD   R17,Y+
 	RET
 ; .FEND
@@ -1675,10 +1730,7 @@ _timer0_ovf_isr:
 ; 0000 0049 unsigned char dot_mask = 0b10000000;
 ; 0000 004A // here display 1 of the digits and add to the sum to calculate the average over 300 readings
 ; 0000 004B Seg1 = 1;
-	SBIW R28,4
-	LDI  R30,LOW(0)
-	ST   Y,R30
-	STD  Y+1,R30
+	RCALL SUBOPT_0x0
 	LDI  R30,LOW(150)
 	STD  Y+2,R30
 	LDI  R30,LOW(67)
@@ -1699,7 +1751,7 @@ _timer0_ovf_isr:
 ; 0000 0050 {
 ; 0000 0051 SegData = SegmentData[DISPLAY[1]];
 	__GETB1MN _DISPLAY,1
-	RCALL SUBOPT_0x0
+	RCALL SUBOPT_0x1
 ; 0000 0052 
 ; 0000 0053 // mask data to turn on dot if error code suggests it
 ; 0000 0054 if (((error_state >> 2) & 0b001) == 0b001){
@@ -1707,135 +1759,130 @@ _timer0_ovf_isr:
 	ANDI R30,LOW(0x1)
 	CPI  R30,LOW(0x1)
 	BRNE _0x40
-; 0000 0055 // TEST_show_value(50);
-; 0000 0056 SegData = SegData | dot_mask;
+; 0000 0055 SegData = SegData | dot_mask;
 	IN   R30,0xB
 	OR   R30,R17
 	OUT  0xB,R30
-; 0000 0057 }
-; 0000 0058 
-; 0000 0059 DISPLAY_Counter++;
+; 0000 0056 }
+; 0000 0057 
+; 0000 0058 DISPLAY_Counter++;
 _0x40:
 	INC  R7
-; 0000 005A Seg3 = 0;
+; 0000 0059 Seg3 = 0;
 	CBI  0x5,2
-; 0000 005B }
-; 0000 005C else if( DISPLAY_Counter == 1)
+; 0000 005A }
+; 0000 005B else if( DISPLAY_Counter == 1)
 	RJMP _0x43
 _0x3F:
 	LDI  R30,LOW(1)
 	CP   R30,R7
 	BRNE _0x44
-; 0000 005D {
-; 0000 005E SegData = SegmentData[DISPLAY[2]];
+; 0000 005C {
+; 0000 005D SegData = SegmentData[DISPLAY[2]];
 	__GETB1MN _DISPLAY,2
-	RCALL SUBOPT_0x0
-; 0000 005F 
-; 0000 0060 if (((error_state >> 1) & 0b001) == 0b001){
+	RCALL SUBOPT_0x1
+; 0000 005E 
+; 0000 005F if (((error_state >> 1) & 0b001) == 0b001){
 	ASR  R31
 	ROR  R30
 	ANDI R30,LOW(0x1)
 	CPI  R30,LOW(0x1)
 	BRNE _0x45
-; 0000 0061 SegData = SegData | dot_mask;
+; 0000 0060 SegData = SegData | dot_mask;
 	IN   R30,0xB
 	OR   R30,R17
 	OUT  0xB,R30
-; 0000 0062 }
-; 0000 0063 
-; 0000 0064 DISPLAY_Counter++;
+; 0000 0061 }
+; 0000 0062 
+; 0000 0063 DISPLAY_Counter++;
 _0x45:
 	INC  R7
-; 0000 0065 Seg2 = 0;
+; 0000 0064 Seg2 = 0;
 	CBI  0x5,1
-; 0000 0066 }
-; 0000 0067 else
+; 0000 0065 }
+; 0000 0066 else
 	RJMP _0x48
 _0x44:
-; 0000 0068 {
-; 0000 0069 SegData = SegmentData[DISPLAY[3]];
+; 0000 0067 {
+; 0000 0068 SegData = SegmentData[DISPLAY[3]];
 	__GETB1MN _DISPLAY,3
-	RCALL SUBOPT_0x0
+	RCALL SUBOPT_0x1
+; 0000 0069 
 ; 0000 006A 
-; 0000 006B 
-; 0000 006C if (((error_state >> 0) & 0b001) == 0b001){
+; 0000 006B if (((error_state >> 0) & 0b001) == 0b001){
 	ANDI R30,LOW(0x1)
 	CPI  R30,LOW(0x1)
 	BRNE _0x49
-; 0000 006D SegData = SegData | dot_mask;
+; 0000 006C SegData = SegData | dot_mask;
 	IN   R30,0xB
 	OR   R30,R17
 	OUT  0xB,R30
-; 0000 006E }
-; 0000 006F 
-; 0000 0070 DISPLAY_Counter = 0;
+; 0000 006D }
+; 0000 006E 
+; 0000 006F DISPLAY_Counter = 0;
 _0x49:
 	CLR  R7
-; 0000 0071 Seg1 = 0;
+; 0000 0070 Seg1 = 0;
 	CBI  0x5,0
-; 0000 0072 }
+; 0000 0071 }
 _0x48:
 _0x43:
-; 0000 0073 //------------------------------
-; 0000 0074 // AveInPout150V += read_vin_volt();
-; 0000 0075 // this should properly scale between 100-200 volts
-; 0000 0076 AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
+; 0000 0072 
+; 0000 0073 // this should properly scale between 100-200 volts
+; 0000 0074 AveInPout150V += (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
 	LDI  R26,0
 	SBIC 0x8,0
 	LDI  R26,1
 	RCALL _read_adc
-	CLR  R22
-	CLR  R23
-	RCALL __CDF1
-	RCALL SUBOPT_0x1
+	RCALL SUBOPT_0x2
+	RCALL SUBOPT_0x3
 	RCALL __MULF12
 	MOVW R26,R30
 	MOVW R24,R22
 	__GETD1N 0x44800000
 	RCALL __DIVF21
-	RCALL SUBOPT_0x1
+	RCALL SUBOPT_0x3
 	RCALL __ADDF12
-	RCALL SUBOPT_0x2
+	RCALL SUBOPT_0x4
 	RCALL __ADDF12
 	STS  _AveInPout150V,R30
 	STS  _AveInPout150V+1,R31
 	STS  _AveInPout150V+2,R22
 	STS  _AveInPout150V+3,R23
-; 0000 0077 
-; 0000 0078 
-; 0000 0079 if(FreeCount++ >= n)
+; 0000 0075 
+; 0000 0076 
+; 0000 0077 if(FreeCount++ >= n)
 	__GETW1R 5,6
 	ADIW R30,1
 	__PUTW1R 5,6
 	SBIW R30,1
 	MOVW R26,R30
-	RCALL SUBOPT_0x3
+	RCALL SUBOPT_0x5
 	CLR  R24
 	CLR  R25
 	RCALL __CDF2
 	RCALL __CMPF12
 	BRLO _0x4C
-; 0000 007A {
-; 0000 007B // calculate average once n readings have been reached
-; 0000 007C FreeCount = 0;
+; 0000 0078 {
+; 0000 0079 // calculate average once n readings have been reached
+; 0000 007A FreeCount = 0;
 	CLR  R5
 	CLR  R6
-; 0000 007D InPout150V = (AveInPout150V/n);
-	RCALL SUBOPT_0x3
-	RCALL SUBOPT_0x2
+; 0000 007B InPout150V = (AveInPout150V/n);
+	RCALL SUBOPT_0x5
+	RCALL SUBOPT_0x4
 	RCALL __DIVF21
 	RCALL __CFD1U
 	__PUTW1R 3,4
-; 0000 007E AveInPout150V=0;
+; 0000 007C AveInPout150V=0;
 	LDI  R30,LOW(0)
 	STS  _AveInPout150V,R30
 	STS  _AveInPout150V+1,R30
 	STS  _AveInPout150V+2,R30
 	STS  _AveInPout150V+3,R30
+; 0000 007D }
+; 0000 007E 
 ; 0000 007F }
-; 0000 0080 
-; 0000 0081 //------------------------------
-; 0000 0082 }
 _0x4C:
 	LDD  R17,Y+0
 	ADIW R28,5
@@ -1855,11 +1902,11 @@ _0x4C:
 	RETI
 ; .FEND
 ;void main(void)
-; 0000 0085 {
+; 0000 0082 {
 _main:
 ; .FSTART _main
-; 0000 0086 float temp_val;
-; 0000 0087 #include <Init.c>
+; 0000 0083 float temp_val;
+; 0000 0084 #include <Init.c>
 	SBIW R28,4
 ;	temp_val -> Y+0
 	LDI  R30,LOW(128)
@@ -1922,175 +1969,321 @@ _main:
 	OUT  0x2C,R30
 	STS  188,R30
 	SEI
-; 0000 0088 
-; 0000 0089 // delay_ms(5*1000);
-; 0000 008A 
-; 0000 008B // turn both LEDs on
-; 0000 008C control_LED(ON, ON);
+; 0000 0085 
+; 0000 0086 delay_ms(5*1000);
+	LDI  R26,LOW(5000)
+	LDI  R27,HIGH(5000)
+	RCALL _delay_ms
+; 0000 0087 
+; 0000 0088 // turn both LEDs on
+; 0000 0089 control_LED(ON, ON);
 	LDI  R30,LOW(1)
 	ST   -Y,R30
 	LDI  R26,LOW(1)
 	RCALL _control_LED
+; 0000 008A 
+; 0000 008B // wait for first voltage to be between 140 and 160
+; 0000 008C steady_voltage();
+	RCALL _steady_voltage
 ; 0000 008D 
-; 0000 008E // wait for first voltage to be between 140 and 160
-; 0000 008F // steady_voltage();
-; 0000 0090 
-; 0000 0091 // set both drivers low and enable on
-; 0000 0092 M_D_R = 0;
+; 0000 008E // set both drivers low and enable on
+; 0000 008F M_D_R = 0;
 	CBI  0x8,3
-; 0000 0093 M_D_L = 0;
+; 0000 0090 M_D_L = 0;
 	CBI  0x8,4
-; 0000 0094 M_EN = 0;
+; 0000 0091 M_EN = 0;
 	CBI  0x8,5
-; 0000 0095 
-; 0000 0096 TEST_show_value(error_state);
-	MOV  R26,R8
-	CLR  R27
-	RCALL _TEST_show_value
-; 0000 0097 
-; 0000 0098 while (1)
+; 0000 0092 
+; 0000 0093 while (1)
 _0x53:
-; 0000 0099 {
+; 0000 0094 {
+; 0000 0095 
+; 0000 0096 check_error_state();
+	RCALL _check_error_state
+; 0000 0097 
+; 0000 0098 //! make this more accurate!
+; 0000 0099 // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
 ; 0000 009A 
-; 0000 009B // check_error_state();
-; 0000 009C 
-; 0000 009D //! make this more accurate!
-; 0000 009E // temp_val = (((read_adc(Sens150Vin)*100.0)/1024.0) + 100);
-; 0000 009F 
-; 0000 00A0 // set value to be shown on 7-seg display
-; 0000 00A1 //! SWITCH TO SHOW VOLTAGE VALUE !!!
-; 0000 00A2 
-; 0000 00A3 // control motor based on reading
-; 0000 00A4 // motor_loop(temp_val);
-; 0000 00A5 
-; 0000 00A6 //! add droop compensation here!
-; 0000 00A7 
-; 0000 00A8 }
+; 0000 009B // set value to be shown on 7-seg display
+; 0000 009C //! SWITCH TO SHOW VOLTAGE VALUE !!!
+; 0000 009D Show_Value(InPout150V);
+	__GETW2R 3,4
+	RCALL _Show_Value
+; 0000 009E 
+; 0000 009F // control motor based on reading
+; 0000 00A0 motor_loop(InPout150V);
+	__GETW1R 3,4
+	RCALL SUBOPT_0x2
+	MOVW R26,R30
+	MOVW R24,R22
+	RCALL _motor_loop
+; 0000 00A1 
+; 0000 00A2 //! add droop compensation here!
+; 0000 00A3 
+; 0000 00A4 }
 	RJMP _0x53
-; 0000 00A9 }
+; 0000 00A5 }
 _0x56:
 	RJMP _0x56
 ; .FEND
 ;void check_error_state(){
-; 0000 00AC void check_error_state(){
-; 0000 00AD // make changes to error state
-; 0000 00AE 
-; 0000 00AF if (InPout150V < 132 && (get_motor_state() == Down))
+; 0000 00A8 void check_error_state(){
+_check_error_state:
+; .FSTART _check_error_state
+; 0000 00A9 // make changes to error state
+; 0000 00AA 
+; 0000 00AB if (InPout150V < 132 && (get_motor_state() == Down))
+	LDI  R30,LOW(132)
+	LDI  R31,HIGH(132)
+	CP   R3,R30
+	CPC  R4,R31
+	BRSH _0x58
+	RCALL _get_motor_state
+	CPI  R30,LOW(0x2)
+	LDI  R26,HIGH(0x2)
+	CPC  R31,R26
+	BREQ _0x59
+_0x58:
+	RJMP _0x57
+_0x59:
+; 0000 00AC {
+; 0000 00AD // voltage below 132V, and lift lowering
+; 0000 00AE error_state = 2;
+	LDI  R30,LOW(2)
+	MOV  R8,R30
+; 0000 00AF }else
+	RJMP _0x5A
+_0x57:
 ; 0000 00B0 {
-; 0000 00B1 // voltage below 132V, and lift lowering
-; 0000 00B2 error_state = 2;
-; 0000 00B3 }else
-; 0000 00B4 {
-; 0000 00B5 // no error state
-; 0000 00B6 error_state = 0;
-; 0000 00B7 }
-; 0000 00B8 }
+; 0000 00B1 // no error state
+; 0000 00B2 error_state = 0;
+	CLR  R8
+; 0000 00B3 }
+_0x5A:
+; 0000 00B4 }
+	RET
+; .FEND
 ;void steady_voltage()
-; 0000 00BB {
-; 0000 00BC // wait for voltage to steady out to being between 160 and 140
-; 0000 00BD 
-; 0000 00BE while(InPout150V>160 || InPout150V < 140){
-; 0000 00BF // keep waiting while greater then 160 or less then 140
-; 0000 00C0 delay_ms(2);
-; 0000 00C1 }
-; 0000 00C2 // finally, should be between 160 and 140 so return
-; 0000 00C3 return;
-; 0000 00C4 }
+; 0000 00B7 {
+_steady_voltage:
+; .FSTART _steady_voltage
+; 0000 00B8 // wait for voltage to steady out to being between 160 and 140
+; 0000 00B9 error_state = 4;
+	LDI  R30,LOW(4)
+	MOV  R8,R30
+; 0000 00BA while(InPout150V>160 || InPout150V < 140){
+_0x5B:
+	LDI  R30,LOW(160)
+	LDI  R31,HIGH(160)
+	CP   R30,R3
+	CPC  R31,R4
+	BRLO _0x5E
+	LDI  R30,LOW(140)
+	LDI  R31,HIGH(140)
+	CP   R3,R30
+	CPC  R4,R31
+	BRSH _0x5D
+_0x5E:
+; 0000 00BB // keep waiting while greater then 160 or less then 140
+; 0000 00BC Show_Value(InPout150V);
+	__GETW2R 3,4
+	RCALL _Show_Value
+; 0000 00BD delay_ms(2);
+	LDI  R26,LOW(2)
+	LDI  R27,0
+	RCALL _delay_ms
+; 0000 00BE }
+	RJMP _0x5B
+_0x5D:
+; 0000 00BF // finally, should be between 160 and 140 so return
+; 0000 00C0 error_state = 0;
+	CLR  R8
+; 0000 00C1 return;
+	RET
+; 0000 00C2 }
+; .FEND
 ;void TEST_show_value(unsigned int In)
-; 0000 00C7 {
-_TEST_show_value:
-; .FSTART _TEST_show_value
-; 0000 00C8 // display integer on 3 digit 7-segment display
-; 0000 00C9 DISPLAY[1] = ((In / 100) % 10);
+; 0000 00C5 {
+; 0000 00C6 // display integer on 3 digit 7-segment display
+; 0000 00C7 DISPLAY[1] = ((In / 100) % 10);
+;	In -> R16,R17
+; 0000 00C8 DISPLAY[2] = ((In / 10) % 10);
+; 0000 00C9 DISPLAY[3] = ((In / 1) % 10);
+; 0000 00CA 
+; 0000 00CB }
+;void Show_Value (unsigned int In)
+; 0000 00CE {
+_Show_Value:
+; .FSTART _Show_Value
+; 0000 00CF // display integer on 3 digit 7-segment display
+; 0000 00D0 if(InPout150V <= 100)
 	ST   -Y,R17
 	ST   -Y,R16
 	MOVW R16,R26
 ;	In -> R16,R17
 	LDI  R30,LOW(100)
 	LDI  R31,HIGH(100)
-	RCALL SUBOPT_0x4
+	CP   R30,R3
+	CPC  R31,R4
+	BRLO _0x60
+; 0000 00D1 {
+; 0000 00D2 DISPLAY[1] = 19;//Err
+	LDI  R30,LOW(19)
 	__PUTB1MN _DISPLAY,1
-; 0000 00CA DISPLAY[2] = ((In / 10) % 10);
+; 0000 00D3 DISPLAY[2] = 20;
+	LDI  R30,LOW(20)
+	__PUTB1MN _DISPLAY,2
+; 0000 00D4 DISPLAY[3] = 20;
+	RJMP _0x6D
+; 0000 00D5 }
+; 0000 00D6 else
+_0x60:
+; 0000 00D7 {
+; 0000 00D8 DISPLAY[1] = ((In / 100) % 10);
+	MOVW R26,R16
+	LDI  R30,LOW(100)
+	LDI  R31,HIGH(100)
+	RCALL SUBOPT_0x6
+	__PUTB1MN _DISPLAY,1
+; 0000 00D9 DISPLAY[2] = ((In / 10) % 10);
 	MOVW R26,R16
 	LDI  R30,LOW(10)
 	LDI  R31,HIGH(10)
-	RCALL SUBOPT_0x4
+	RCALL SUBOPT_0x6
 	__PUTB1MN _DISPLAY,2
-; 0000 00CB DISPLAY[3] = ((In / 1) % 10);
+; 0000 00DA DISPLAY[3] = ((In / 1) % 10);
 	MOVW R26,R16
 	LDI  R30,LOW(10)
 	LDI  R31,HIGH(10)
 	RCALL __MODW21U
+_0x6D:
 	__PUTB1MN _DISPLAY,3
-; 0000 00CC 
-; 0000 00CD }
+; 0000 00DB }
+; 0000 00DC }
 	LD   R16,Y+
 	LD   R17,Y+
 	RET
 ; .FEND
-;void Show_Value (unsigned int In)
-; 0000 00D0 {
-; 0000 00D1 // display integer on 3 digit 7-segment display
-; 0000 00D2 if(InPout150V <= 100)
-;	In -> R16,R17
-; 0000 00D3 {
-; 0000 00D4 DISPLAY[1] = 19;//Err
-; 0000 00D5 DISPLAY[2] = 20;
-; 0000 00D6 DISPLAY[3] = 20;
-; 0000 00D7 }
-; 0000 00D8 else
-; 0000 00D9 {
-; 0000 00DA DISPLAY[1] = ((In / 100) % 10);
-; 0000 00DB DISPLAY[2] = ((In / 10) % 10);
-; 0000 00DC DISPLAY[3] = ((In / 1) % 10);
-; 0000 00DD }
-; 0000 00DE }
 ;void motor_loop(float In150V_Val)
-; 0000 00E1 {
-; 0000 00E2 //! make this have latch functionality
+; 0000 00DF {
+_motor_loop:
+; .FSTART _motor_loop
+; 0000 00E0 //! make this have latch functionality
+; 0000 00E1 
+; 0000 00E2 float latch_val = 150;
 ; 0000 00E3 
-; 0000 00E4 float latch_val = 150;
-; 0000 00E5 
-; 0000 00E6 // if voltage > 160, go up
-; 0000 00E7 if(In150V_Val > 160)
+; 0000 00E4 // if voltage > 160, go up
+; 0000 00E5 if(In150V_Val > 160)
+	RCALL __PUTPARD2
+	RCALL SUBOPT_0x0
+	LDI  R30,LOW(22)
+	STD  Y+2,R30
+	LDI  R30,LOW(67)
+	STD  Y+3,R30
 ;	In150V_Val -> Y+4
 ;	latch_val -> Y+0
-; 0000 00E8 {
-; 0000 00E9 // lift UP
-; 0000 00EA Motor_R_L_Off(Right);// Right Left OFF
-; 0000 00EB 
-; 0000 00EC return;
-; 0000 00ED }
-; 0000 00EE 
-; 0000 00EF // if voltage between 140,105 go down
-; 0000 00F0 if((In150V_Val < 140) && (In150V_Val > 105))
-; 0000 00F1 {
-; 0000 00F2 // lift DOWN
-; 0000 00F3 Motor_R_L_Off(Left);// Right Left OFF
-; 0000 00F4 
-; 0000 00F5 if (In150V_Val < 132){
-; 0000 00F6 // turn off one headlamp until lift stops moving
-; 0000 00F7 control_LED(ON, OFF);
+	RCALL SUBOPT_0x7
+	__GETD1N 0x43200000
+	RCALL __CMPF12
+	BREQ PC+2
+	BRCC PC+2
+	RJMP _0x62
+; 0000 00E6 {
+; 0000 00E7 // lift UP
+; 0000 00E8 Motor_R_L_Off(Right);// Right Left OFF
+	LDI  R26,LOW(1)
+	RCALL _Motor_R_L_Off
+; 0000 00E9 
+; 0000 00EA return;
+	RJMP _0x2000001
+; 0000 00EB }
+; 0000 00EC 
+; 0000 00ED // if voltage between 140,105 go down
+; 0000 00EE if((In150V_Val < 140) && (In150V_Val > 105))
+_0x62:
+	RCALL SUBOPT_0x7
+	__GETD1N 0x430C0000
+	RCALL __CMPF12
+	BRSH _0x64
+	RCALL SUBOPT_0x7
+	__GETD1N 0x42D20000
+	RCALL __CMPF12
+	BREQ PC+2
+	BRCC PC+2
+	RJMP _0x64
+	RJMP _0x65
+_0x64:
+	RJMP _0x63
+_0x65:
+; 0000 00EF {
+; 0000 00F0 // lift DOWN
+; 0000 00F1 Motor_R_L_Off(Left);// Right Left OFF
+	LDI  R26,LOW(2)
+	RCALL _Motor_R_L_Off
+; 0000 00F2 
+; 0000 00F3 if (In150V_Val < 132){
+	RCALL SUBOPT_0x7
+	__GETD1N 0x43040000
+	RCALL __CMPF12
+	BRSH _0x66
+; 0000 00F4 // turn off one headlamp until lift stops moving
+; 0000 00F5 control_LED(ON, OFF);
+	LDI  R30,LOW(1)
+	ST   -Y,R30
+	LDI  R26,LOW(0)
+	RCALL _control_LED
+; 0000 00F6 }
+; 0000 00F7 return;
+_0x66:
+	RJMP _0x2000001
 ; 0000 00F8 }
-; 0000 00F9 return;
-; 0000 00FA }
-; 0000 00FB 
-; 0000 00FC if (get_motor_state() == Up && (In150V_Val < latch_val)){
-; 0000 00FD // motor is going up and latch was bypassed!
-; 0000 00FE 
-; 0000 00FF // stop motor
-; 0000 0100 Motor_R_L_Off(OFF);
-; 0000 0101 }
-; 0000 0102 
-; 0000 0103 if (get_motor_state() == Down && (In150V_Val > latch_val)){
-; 0000 0104 // motor is going down and latch was bypassed!
-; 0000 0105 
-; 0000 0106 // stop motor
-; 0000 0107 Motor_R_L_Off(OFF);
-; 0000 0108 }
-; 0000 0109 
-; 0000 010A 
-; 0000 010B }
+; 0000 00F9 
+; 0000 00FA if (get_motor_state() == Up && (In150V_Val < latch_val)){
+_0x63:
+	RCALL _get_motor_state
+	SBIW R30,1
+	BRNE _0x68
+	RCALL SUBOPT_0x8
+	BRLO _0x69
+_0x68:
+	RJMP _0x67
+_0x69:
+; 0000 00FB // motor is going up and latch was bypassed!
+; 0000 00FC 
+; 0000 00FD // stop motor
+; 0000 00FE Motor_R_L_Off(OFF);
+	LDI  R26,LOW(0)
+	RCALL _Motor_R_L_Off
+; 0000 00FF }
+; 0000 0100 
+; 0000 0101 if (get_motor_state() == Down && (In150V_Val > latch_val)){
+_0x67:
+	RCALL _get_motor_state
+	SBIW R30,2
+	BRNE _0x6B
+	RCALL SUBOPT_0x8
+	BREQ PC+2
+	BRCC PC+2
+	RJMP _0x6B
+	RJMP _0x6C
+_0x6B:
+	RJMP _0x6A
+_0x6C:
+; 0000 0102 // motor is going down and latch was bypassed!
+; 0000 0103 
+; 0000 0104 // stop motor
+; 0000 0105 Motor_R_L_Off(OFF);
+	LDI  R26,LOW(0)
+	RCALL _Motor_R_L_Off
+; 0000 0106 }
+; 0000 0107 
+; 0000 0108 
+; 0000 0109 }
+_0x6A:
+_0x2000001:
+	ADIW R28,8
+	RET
+; .FEND
 
 	.DSEG
 _AveInPout150V:
@@ -2101,8 +2294,16 @@ _SegmentData:
 	.BYTE 0x34
 
 	.CSEG
-;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:10 WORDS
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
 SUBOPT_0x0:
+	SBIW R28,4
+	LDI  R30,LOW(0)
+	ST   Y,R30
+	STD  Y+1,R30
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:10 WORDS
+SUBOPT_0x1:
 	LDI  R31,0
 	SUBI R30,LOW(-_SegmentData)
 	SBCI R31,HIGH(-_SegmentData)
@@ -2113,12 +2314,19 @@ SUBOPT_0x0:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x1:
+SUBOPT_0x2:
+	CLR  R22
+	CLR  R23
+	RCALL __CDF1
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+SUBOPT_0x3:
 	__GETD2N 0x42C80000
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:6 WORDS
-SUBOPT_0x2:
+SUBOPT_0x4:
 	LDS  R26,_AveInPout150V
 	LDS  R27,_AveInPout150V+1
 	LDS  R24,_AveInPout150V+2
@@ -2127,17 +2335,29 @@ SUBOPT_0x2:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x3:
+SUBOPT_0x5:
 	__GETD1S 1
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x4:
+SUBOPT_0x6:
 	RCALL __DIVW21U
 	MOVW R26,R30
 	LDI  R30,LOW(10)
 	LDI  R31,HIGH(10)
 	RCALL __MODW21U
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:13 WORDS
+SUBOPT_0x7:
+	__GETD2S 4
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
+SUBOPT_0x8:
+	__GETD1S 0
+	RCALL SUBOPT_0x7
+	RCALL __CMPF12
 	RET
 
 ;RUNTIME LIBRARY
@@ -2187,6 +2407,13 @@ __DIVW21U3:
 __MODW21U:
 	RCALL __DIVW21U
 	MOVW R30,R26
+	RET
+
+__PUTPARD2:
+	ST   -Y,R25
+	ST   -Y,R24
+	ST   -Y,R27
+	ST   -Y,R26
 	RET
 
 __CDF2U:
@@ -2715,6 +2942,17 @@ __CMPF120:
 	BRLO __CMPF122
 	BREQ __CMPF123
 	RJMP __CMPF121
+
+_delay_ms:
+	adiw r26,0
+	breq __delay_ms1
+__delay_ms0:
+	wdr
+	__DELAY_USW 0xFA0
+	sbiw r26,1
+	brne __delay_ms0
+__delay_ms1:
+	ret
 
 ;END OF CODE MARKER
 __END_OF_CODE:

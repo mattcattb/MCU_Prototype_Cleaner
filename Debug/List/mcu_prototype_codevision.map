@@ -20,8 +20,13 @@ DISPLAY_Counter                                                                 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-control_LED                                                                       0x00087     20
-read_adc                                                                          0x0009B     29
-timer0_ovf_isr                                                                    0x000B8    143
-main                                                                              0x00147    102
-TEST_show_value                                                                   0x001AD     23
+Motor_R_L_Off                                                                     0x00087     18
+get_motor_state                                                                   0x00099     20
+control_LED                                                                       0x000AD     20
+read_adc                                                                          0x000C1     29
+timer0_ovf_isr                                                                    0x000DE    138
+main                                                                              0x00168    113
+check_error_state                                                                 0x001D9     16
+steady_voltage                                                                    0x001E9     21
+Show_Value                                                                        0x001FE     36
+motor_loop                                                                        0x00222     71
